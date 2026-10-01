@@ -207,14 +207,14 @@ Companion to `A-Day-in-Dhaka-PLAN.md`. Put this file at `/docs/storyboard/SCRIPT
 
 **What we see**
 - Empty street under one warm streetlamp. Deep blue-black sky.
-- A single rickshaw puller pedaling slowly home through the light.
-- Closed shutters, a stray dog sleeping, a few windows still lit.
+- The puller from noon rests beneath the lamp, recognizable by the same gold headband and garment stripe.
+- Closed shutters, the dawn dog following the stroller, a few windows still lit.
 - Faint stars returning, echoing Scene 1 so the day feels like a loop.
 
 **Motion on scroll**
 - Very slow zoom out as you scroll, revealing the whole sleeping skyline.
-- Rickshaw moves into the distance and the lamp light shrinks to a dot.
-- That dot becomes the sunrise circle from Scene 0, closing the loop.
+- The stroller leaves the second cup beside the resting puller without waking him; the dog follows them home.
+- The lamp reflected in the tea becomes the centered 14px circle from Scene 0, closing the loop.
 - Credits fade in over the dark skyline.
 
 **Text**
@@ -223,7 +223,7 @@ Companion to `A-Day-in-Dhaka-PLAN.md`. Put this file at `/docs/storyboard/SCRIPT
 - Credits: Designed and built by Shahriar Islam Dip. Include portfolio link, social links, and a "Scroll up to start again" button.
 
 **Sound:** Crickets, a distant train, a last soft note that fades to silence.
-**End:** Scroll-to-top button restarts the loop.
+**End:** After the credits, **কাল আবার।** / *Again tomorrow.* appears above the working restart button.
 
 ---
 
@@ -235,6 +235,25 @@ Companion to `A-Day-in-Dhaka-PLAN.md`. Put this file at `/docs/storyboard/SCRIPT
 - **Sky gradient:** one continuous background gradient that never jumps between scenes.
 - **Recurring motifs:** the circle of light (Scene 0 and 7), the rickshaw (Scenes 3, 4, 7), and the bell sound as a connecting thread.
 
+## Tea-cup thread (implemented 2026-10-01)
+
+The recurring faceless stroller has the same shawl, sleeves and small handleless chai glass throughout. The morning seller returns in the evening; the noon puller and dawn dog return at midnight. Scene 1 deliberately has empty hands.
+
+| Scene | Wide-to-close action | Cup state | Close Bangla / English |
+|---|---|---|---|
+| 1 | Cold palms on the riverbank; a dog comes to sit beside them | none | ঠান্ডা। এক কাপ চা দরকার। / Cold. I need a cup of tea. |
+| 2 | The seller offers steaming tea and waves away payment | full | “পরে দিয়েন।” / “Pay me later.” |
+| 3 | A child crosses during the jam; a raised glass stays level | half | শুধু কাপটা যেন না পড়ে। / Just don't let it spill. |
+| 4 | Stroller and recognizable puller sit in the same shade | cold | চা ঠান্ডা, ছায়া ভাগাভাগি। / Cold tea, shared shade. |
+| 5 | The fallen kite is handed back to a child; the glass rests on the ledge | empty | “এটা তোমার।” / “This is yours.” |
+| 6 | The morning debt is paid; one cup is drunk and a second is carried | refilled | “দুই কাপ। আর সকালেরটাও।” / “Two cups. And this morning's too.” |
+| 7 | Tea is left beside the resting puller; the dog follows; lamp reflection closes the loop | given | Silent. No close caption. |
+
+City copy remains verbatim. Three quiet stroller lines and exactly three spoken lines appear as real bilingual DOM text, on a stable dark close-shot backdrop. All Bangla remains pending native review.
+
+Scene heights: **100 / 200 / 200 / 450 / 200 / 200 / 200 / 220 svh**, totaling **1770svh**. Scenes 1–7 show the city until 0.36, push to close over 0.36–0.46, hold through 0.70, then return wide over 0.70–0.80. Midnight holds the close to turn the actual tea reflection into the opening dot, then reveals credits at 0.87 and the closing line at 0.95. Reduced motion uses opacity only; both compositions and all story text remain present. No sound ships at launch, as recorded in `00-assumptions.md`.
+
+---
 ## Open decisions for me
 
 - [ ] Pick the illustration style (flat vector with grain is the default)

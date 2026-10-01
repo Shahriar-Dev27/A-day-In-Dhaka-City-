@@ -2,8 +2,9 @@
 // Run: npm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { SCENES, SCENE_OFFSETS, SCROLL_RANGE_SVH, TOTAL_SVH, progressToClockMinutes, skyAnchors, textWindowSvh } from "../lib/scenes.ts";
-import { CLOCK_FG, CLOCK_PILL_ALPHA, cssVars, palette, toCssVarObject } from "../lib/palette.ts";
+import { CLOCK_FG, CLOCK_PILL_ALPHA, cssVars, palette, storyVars, toCssVarObject } from "../lib/palette.ts";
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 const lum = (c) => {
@@ -15,9 +16,9 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 
 test("scene registry: offsets and ranges are consistent", () => {
   assert.deepEqual(SCENES.map((s) => s.id), [0, 1, 2, 3, 4, 5, 6, 7]);
-  assert.deepEqual([...SCENE_OFFSETS], [0, 100, 250, 400, 800, 950, 1100, 1250]);
-  assert.equal(TOTAL_SVH, 1400);
-  assert.equal(SCROLL_RANGE_SVH, 1300);
+  assert.deepEqual([...SCENE_OFFSETS], [0, 100, 300, 500, 950, 1150, 1350, 1550]);
+  assert.equal(TOTAL_SVH, 1770);
+  assert.equal(SCROLL_RANGE_SVH, 1670);
 });
 
 test("progressToClockMinutes: hits every scene anchor at its slot start", () => {
@@ -45,7 +46,7 @@ test("progressToClockMinutes: monotonic and continuous (no jump at slot boundari
   for (let i = 1; i <= 1000; i++) {
     const m = progressToClockMinutes(i / 1000);
     assert.ok(m >= prev, `decreased at ${i / 1000}`);
-    // steepest segment is 6->7: 255 min over 150svh = 2.21 min per 1.3svh (0.1% of the range)
+    // Steepest segment: 255 minutes over 200svh, sampled every 1.67svh.
     assert.ok(m - prev <= 2.3, `jump of ${m - prev} min at ${i / 1000}`);
     prev = m;
   }
@@ -60,6 +61,18 @@ test("toCssVarObject: maps every token to its CSS var, nothing else", () => {
 
 test("palette: every value is a 6-digit hex", () => {
   for (const [id, t] of Object.entries(palette)) for (const [k, v] of Object.entries(t)) assert.match(v, /^#[0-9A-F]{6}$/i, `${id}.${k}`);
+});
+
+test("close story: bilingual copy stays within eight words and its stable backdrop stays AA", () => {
+  for (const name of ["Scene1Azaan", "Scene2OldDhaka", "Scene3Rush", "Scene4Noon", "Scene5GoldenHour", "Scene6Neon", "Scene7Midnight"]) {
+    const source = readFileSync(new URL(`../components/scenes/${name}.tsx`, import.meta.url), "utf8");
+    const line = source.match(/(?:close|closing): \{ bn: "([^"]+)", en: "([^"]+)" \}/);
+    assert.ok(line, `${name}: missing close or closing copy`);
+    for (const text of line.slice(1)) assert.ok(text.trim().split(/\s+/u).length <= 8, `${name}: ${text}`);
+  }
+  for (const fg of ["--story-copy", "--story-muted"]) {
+    for (const bg of ["--story-bg", "--story-edge"]) assert.ok(contrast(hex(storyVars[fg]), hex(storyVars[bg])) >= 4.5, `${fg}/${bg}`);
+  }
 });
 
 test("contrast at each scene plateau: text and muted text >= 4.5:1 on both sky stops", () => {
@@ -123,7 +136,7 @@ test("contrast: text stays AA through every dark/light inversion, wherever it is
 
 test("contrast: always-visible clock (fixed fg on ink pill) >= 4.5:1 at every scroll position, even over white sky", () => {
   const fg = hex(CLOCK_FG);
-  for (let i = 0; i <= 1300; i++) {
+  for (let i = 0; i <= SCROLL_RANGE_SVH; i++) {
     const ink = asRgb(paletteAt(i / SCROLL_RANGE_SVH).ink);
     for (const sky of [[255, 255, 255], [0, 0, 0], ...["skyTop", "skyBottom"].map((k) => asRgb(paletteAt(i / SCROLL_RANGE_SVH)[k]))]) {
       const bg = mix(sky, ink, CLOCK_PILL_ALPHA);

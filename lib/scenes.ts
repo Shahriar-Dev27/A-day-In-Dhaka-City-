@@ -20,13 +20,13 @@ export interface SceneProps {
 
 export const SCENES: readonly SceneMeta[] = [
   { id: 0, slug: "intro", clockMinutes: null, scrollLength: 100, ease: "default" },
-  { id: 1, slug: "azaan", clockMinutes: 285, scrollLength: 150, ease: "calm" },
-  { id: 2, slug: "old-dhaka", clockMinutes: 420, scrollLength: 150, ease: "default" },
-  { id: 3, slug: "rush", clockMinutes: 540, scrollLength: 400, ease: "snappy" },
-  { id: 4, slug: "noon", clockMinutes: 780, scrollLength: 150, ease: "calm" },
-  { id: 5, slug: "golden-hour", clockMinutes: 990, scrollLength: 150, ease: "default" },
-  { id: 6, slug: "neon", clockMinutes: 1170, scrollLength: 150, ease: "snappy" },
-  { id: 7, slug: "midnight", clockMinutes: 1425, scrollLength: 150, ease: "calm" },
+  { id: 1, slug: "azaan", clockMinutes: 285, scrollLength: 200, ease: "calm" },
+  { id: 2, slug: "old-dhaka", clockMinutes: 420, scrollLength: 200, ease: "default" },
+  { id: 3, slug: "rush", clockMinutes: 540, scrollLength: 450, ease: "snappy" },
+  { id: 4, slug: "noon", clockMinutes: 780, scrollLength: 200, ease: "calm" },
+  { id: 5, slug: "golden-hour", clockMinutes: 990, scrollLength: 200, ease: "default" },
+  { id: 6, slug: "neon", clockMinutes: 1170, scrollLength: 200, ease: "snappy" },
+  { id: 7, slug: "midnight", clockMinutes: 1425, scrollLength: 220, ease: "calm" },
 ];
 
 export const EASE: Record<SceneMeta["ease"], string> = {
@@ -70,20 +70,18 @@ export function progressToClockMinutes(globalProgress: number): number {
 // The text beats (scene-kit's useSceneTimeline) fade in at BEAT_IN and are fully gone by BEAT_OUT_END
 // (fractions of the scene's ScrollTrigger range). The sky only changes colour OUTSIDE these windows, so
 // text is never on screen while --text and the sky lerp through each other (dark/light inversions).
-export const BEAT_IN = 0.22;
-export const BEAT_OUT_END = 0.95; // timeline: exit at 0.74 + stagger + 0.14 = 0.91, rounded up for safety
-/** Where each ScrollTrigger starts, in svh scroll relative to the slot top. Scene 3 passes start "top top". */
+export const BEAT_IN = 0.12;
+export const BEAT_OUT_END = 0.36;
 const TRIGGER_START_SVH: Partial<Record<number, number>> = { 3: 0 };
-const DEFAULT_TRIGGER_START_SVH = -70; // "top 70%"
+const DEFAULT_TRIGGER_START_SVH = -70;
 
 /** Global scroll position (svh) between which scene `id`'s text can be visible. */
 export function textWindowSvh(id: number): { start: number; end: number } {
   if (id === 0) return { start: 0, end: 80 }; // Scene 0 fades out over its first 80svh ("top top" -> "bottom top")
-  const hold = id === SCENES.length - 1; // last scene keeps its text to the end
   const trigStart = SCENE_OFFSETS[id] + (TRIGGER_START_SVH[id] ?? DEFAULT_TRIGGER_START_SVH);
   const trigEnd = SCENE_OFFSETS[id] + SCENES[id].scrollLength - 100;
   const range = trigEnd - trigStart;
-  return { start: trigStart + BEAT_IN * range, end: hold ? SCROLL_RANGE_SVH : trigStart + BEAT_OUT_END * range };
+  return { start: trigStart + BEAT_IN * range, end: trigStart + BEAT_OUT_END * range };
 }
 
 /**

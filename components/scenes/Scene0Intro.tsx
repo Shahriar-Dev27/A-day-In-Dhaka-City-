@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { LIGHT_DOT } from "@/lib/scenes";
 import { Art, SplitWords, Stage, useSceneTimeline, type Line } from "./scene-kit";
 
 const COPY = {
@@ -36,8 +37,8 @@ export default function Scene0Intro() {
         <Art viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
           <circle data-halo cx="800" cy="450" r="260" className="fill-glow" opacity="0.14" />
           <circle data-halo cx="800" cy="450" r="150" className="fill-glow" opacity="0.2" />
-          <circle data-dot cx="800" cy="450" r="64" className="fill-glow" />
         </Art>
+        <span data-dot aria-hidden="true" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-glow" style={{ width: LIGHT_DOT.sizePx, height: LIGHT_DOT.sizePx }} />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center px-(--gutter) text-center">
           <h1 data-beat data-intro-reveal className="mt-[34svh]">

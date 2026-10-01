@@ -63,11 +63,13 @@ export default function Loader({
 
     stopScroll();
     // The veil hides the real scroll position, so a browser-restored one would hand off mid-story.
+    const restoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
     const started = performance.now();
     let done = false;
+    let disposed = false;
     let floorTimer = 0;
 
     /** The only exit. Unlocks the page and lets Experience unmount this veil. */
@@ -93,12 +95,15 @@ export default function Loader({
       gsap.set(words, { yPercent: 110, autoAlpha: 0 });
       gsap.set(prompt, { autoAlpha: 0, y: 16 });
 
-      const grow = gsap.quickTo(dot, "scale", { duration: 0.5, ease: "power2.out" });
+      const growX = gsap.quickTo(dot, "scaleX", { duration: 0.5, ease: "power2.out" });
+      const growY = gsap.quickTo(dot, "scaleY", { duration: 0.5, ease: "power2.out" });
       const brighten = gsap.quickTo(dot, "opacity", { duration: 0.5, ease: "power2.out" });
       let settled = 0;
       const step = () => {
+        if (done || disposed) return;
         const p = ++settled / steps.length;
-        grow(0.2 + 0.8 * p); // SCRIPT: 0.2 -> 1 across the load
+        growX(0.2 + 0.8 * p);
+        growY(0.2 + 0.8 * p);
         brighten(0.55 + 0.45 * p);
       };
       steps.forEach((s) => s.then(step, step));
@@ -130,15 +135,18 @@ export default function Loader({
     }, root);
 
     void Promise.allSettled(steps).then(() => {
+      if (disposed) return;
       floorTimer = window.setTimeout(() => exit(), Math.max(0, MIN_MS - (performance.now() - started)));
     });
     const capTimer = window.setTimeout(() => exit(), MAX_MS);
 
     return () => {
+      disposed = true;
       clearTimeout(floorTimer);
       clearTimeout(capTimer);
       ctx.revert(); // kills the tweens and restores the title's visible, unstyled state
       startScroll(); // never leave the page locked, however this unmounts
+      history.scrollRestoration = restoration;
     };
   }, [assets, onComplete, reducedMotion]);
 

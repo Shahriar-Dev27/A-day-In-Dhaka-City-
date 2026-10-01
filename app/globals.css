@@ -42,6 +42,16 @@
   --gutter: clamp(1.25rem, 5vw, 4rem);
 }
 
+.story-close {
+  background: radial-gradient(ellipse at 50% 40%, var(--story-edge), var(--story-bg) 72%);
+  color: var(--story-copy);
+  visibility: hidden;
+  opacity: 0;
+}
+.story-line p[lang="en"] { color: var(--story-muted); }
+.story-art { padding-bottom: 15svh; }
+.story-art.story-reflection-art { padding-bottom: 0; }
+
 html {
   /* Sky fills any overscroll area instead of flashing white. */
   background: var(--sky-bottom);

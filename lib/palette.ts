@@ -1,4 +1,15 @@
+import type { CSSProperties } from "react";
+
 export type SceneId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+// Stable close-shot colours keep dialogue readable while the city sky changes.
+export const storyVars: CSSProperties & Record<`--${string}`, string> = {
+  "--story-bg": "#0C1420", "--story-edge": "#1C2A35",
+  "--story-copy": "#F4EFE2", "--story-muted": "#C4D8DB",
+  "--story-cloth": "#273F49", "--story-shawl": "#9CACAA",
+  "--story-skin": "#D6AC83", "--story-glass": "#E5B76B",
+  "--story-rim": "#F8DEAD", "--story-tea": "#A65320", "--story-gold": "#F3C877",
+};
 
 export interface PaletteTokens {
   skyTop: string; // hex; top of the continuous sky gradient

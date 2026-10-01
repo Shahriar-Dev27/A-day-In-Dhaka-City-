@@ -1,7 +1,7 @@
 # Design: the tea-cup story thread
 
 **Date:** 2026-10-01
-**Status:** approved in brainstorming, pending spec review
+**Status:** implementation authorized by the user on 2026-10-01; native copy, comprehension and real-device launch gates remain pending
 **Changes:** `SCRIPT.md` (storyboard), all 8 scene components, `components/scenes/scene-kit.tsx`, `lib/scenes.ts` scroll budget. Adds `components/scenes/story-kit.tsx`.
 **Supersedes:** nothing. This is additive to `.devteam/a-day-in-dhaka/01-plan.md`, whose interface contract (§4.3) still holds.
 
@@ -156,7 +156,7 @@ After the Scene 7 credits beat: **কাল আবার।** / *Again tomorrow.
 
 ### 5.5 Word counts
 
-Every new line is ≤6 English words, against the 8-word rule in `SCRIPT.md`. This design adds
+Every new line is ≤8 English words, against the 8-word rule in `SCRIPT.md`. This design adds
 no new violations and does not fix the three existing ones (scenes 2/4/5, `04-errors` #8),
 which remain the user's decision.
 
@@ -326,7 +326,7 @@ Additions to `01-plan.md` §6. The existing criteria all still apply.
 - **AC-T1 (comprehension — the real test).** Three people who have never seen the site scroll it
   once, told nothing. At least two must answer both: *who were we following?* and *what did they
   do with the cup?* If they cannot, the thread has failed regardless of how good it looks.
-- **AC-T2.** The cup is present and its state readable in every scene 1–7, at 390px wide, in both
+- **AC-T2.** The cup state, including its deliberate absence in Scene 1, is readable in every scene 1–7, at 390px wide, in both
   motion modes.
 - **AC-T3.** Under `prefers-reduced-motion: reduce`, all seven close beats and all three text
   registers appear; no scale is applied to either layer; the global transform probe stays at 0.
@@ -353,7 +353,7 @@ Explicitly out of scope, to protect against the scope creep `PLAN.md` §7 warns 
   `PLAN.md` §5 stays post-launch.
 - No audio work. Sound is not shipping at launch (`00-assumptions.md` Q2), and this design does
   not depend on it — the three spoken lines are text.
-- No new dependencies.
+- No dependencies beyond the original development plan's Three.js / React Three Fiber / drei stack.
 
 ## 11. Risks
 

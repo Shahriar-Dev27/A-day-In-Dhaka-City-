@@ -1,12 +1,17 @@
 "use client";
 
 import { useRef } from "react";
+import { gsap } from "@/lib/gsap";
+import { getScrollVelocityNorm } from "@/lib/scroll";
+import { storyVars } from "@/lib/palette";
 import { EASE, SCENES } from "@/lib/scenes";
-import { SceneText, Stage, useSceneTimeline, type Line } from "./scene-kit";
+import { Art, SceneText, Stage, useSceneTimeline, type Line } from "./scene-kit";
+import { CloseArt, CloseBeat, Cup, Figure, FigureLine } from "./story-kit";
 
 const COPY = {
   time: { bn: "সকাল ৯টা", en: "9:00 AM" } satisfies Line,
   line: { bn: "৯টা বাজে, ঢাকা থামে না", en: "9 o'clock, and Dhaka never stops" } satisfies Line,
+  close: { bn: "শুধু কাপটা যেন না পড়ে।", en: "Just don't let it spill." } satisfies Line,
   words: [
     { bn: "ব্যস্ত", en: "busy" },
     { bn: "ভিড়", en: "crowded" },
@@ -31,6 +36,7 @@ function Rickshaw({ x, tone }: { x: number; tone: "accent" | "glow" }) {
       <path d={`M${x} 760 h230 v-120 a120 120 0 0 0 -230 0z`} className={tone === "accent" ? "fill-accent" : "fill-glow"} />
       <path d={`M${x + 230} 760 h120 v-80 h-120z`} className="fill-ink" />
       <rect x={x + 14} y="772" width="210" height="14" className="fill-ink" />
+      <path d={`M${x + 24} 724q40-72 84 0t90 0M${x + 52} 664l31-24 31 24-31 24Z`} fill="none" strokeWidth="9" className="stroke-glow" />
       <Wheel cx={x + 40} cy={806} />
       <Wheel cx={x + 300} cy={806} />
     </g>
@@ -70,32 +76,51 @@ export default function Scene3Rush() {
 
   useSceneTimeline(root, (tl, mode, q) => {
     if (mode === "reduce") {
-      tl.fromTo(q("[data-word-static]"), { autoAlpha: 0 }, { autoAlpha: 1, stagger: 0.12, duration: 0.2, ease: "power2.out" }, 0.1);
+      gsap.set(q("[data-word-static]"), { autoAlpha: 0 });
+      tl.to(q("[data-word-static]"), { autoAlpha: 1, stagger: 0.03, duration: 0.05 }, 0.12);
       return;
     }
     const track = q("[data-track]")[0] as HTMLElement;
     const T = () => track.offsetWidth - window.innerWidth; // total travel in px
     const units = () => TRACK_UNITS / track.offsetWidth; // px -> art units
-    // Jam beat: for 15% of the slot the track advances at ~20% speed, then catches up. All scrub, no timers.
-    tl.fromTo(track, { x: 0 }, { x: () => -0.55 * T(), duration: 0.55 }, 0)
-      .to(track, { x: () => -0.58 * T(), duration: 0.15 }, 0.55)
-      .to(track, { x: () => -T(), duration: 0.3, ease: "power2.out" }, 0.7); // no overshoot: back.out would pass -T
+    tl.fromTo(track, { x: 0 }, { x: () => -0.45 * T(), duration: 0.18 }, 0)
+      .to(track, { x: () => -0.46 * T(), duration: 0.14 }, 0.18)
+      .to(track, { x: () => -T(), duration: 0.68, ease: "power2.out" }, 0.32);
+    tl.fromTo(q("[data-child-crossing]"), { x: -110 }, { x: 110, duration: 0.14 }, 0.18);
     // Per-layer speeds: far layer lags the track, near layer outruns it.
     tl.to(q('[data-layer="far"]'), { x: () => 0.45 * T() * units(), duration: 1 }, 0);
     tl.to(q('[data-layer="near"]'), { x: () => -0.25 * T() * units(), duration: 1 }, 0);
-    // PLACEHOLDER: wheels spin with scroll progress; Phase 4 drives rotation from getScrollVelocity() in a ticker.
-    tl.to(q("[data-wheel]"), { rotation: 2160, transformOrigin: "50% 50%", duration: 1 }, 0);
     tl.fromTo(q("[data-word]"), { scale: 0.92 }, { scale: 1, transformOrigin: "0% 100%", stagger: 0.3, duration: 0.2, ease }, 0);
-  }, { start: "top top" });
+    const wheels = q("[data-wheel]");
+    const cup = q('[data-close] [data-cup]');
+    const liquid = q('[data-close] [data-liquid]');
+    gsap.set(wheels, { rotation: 0, transformOrigin: "50% 50%" });
+    gsap.set(cup, { rotation: 0, svgOrigin: "0 42" });
+    gsap.set(liquid, { rotation: 0, svgOrigin: "0 42" });
+    const turnWheels = gsap.quickSetter(wheels, "rotation", "deg");
+    const tiltCup = gsap.quickSetter(cup, "rotation", "deg");
+    const levelTea = gsap.quickSetter(liquid, "rotation", "deg");
+    let angle = 0;
+    const tick = (_time: number, delta: number) => {
+      if (!tl.scrollTrigger?.isActive || document.hidden) return;
+      const velocity = getScrollVelocityNorm();
+      angle += velocity * delta * 0.8;
+      turnWheels(angle);
+      tiltCup(velocity * 5);
+      levelTea(-velocity * 5);
+    };
+    gsap.ticker.add(tick);
+    return () => gsap.ticker.remove(tick);
+  }, { close: true, start: "top top" });
 
   const words = COPY.words;
   return (
     <div ref={root} className="relative h-full">
       <Stage label={COPY.line.en}>
-        <div data-track className="absolute inset-y-0 left-0 w-[640svh]">
+        <div data-city data-track className="absolute inset-y-0 left-0 w-[640svh]">
           {/* Words sit behind the vehicle layers... */}
-          <Word w={words[0]} className="top-[40svh] left-[10%]" tone="text-ink" />
-          <Word w={words[1]} className="top-[36svh] left-[46%]" tone="text-accent [-webkit-text-stroke:3px_var(--ink)]" />
+          <Word w={words[0]} className="top-[52svh] left-[10%]" tone="text-ink" />
+          <Word w={words[1]} className="top-[52svh] left-[46%]" tone="text-accent [-webkit-text-stroke:3px_var(--ink)]" />
           <svg aria-hidden="true" focusable="false" viewBox={`0 0 ${TRACK_UNITS} 900`} preserveAspectRatio="xMinYMax meet" className="absolute inset-0 h-full w-full">
             <g data-layer="far" className="fill-ink" opacity="0.35">
               {[200, 900, 1700, 2500, 3300, 4100, 4900].map((x, i) => (
@@ -115,10 +140,17 @@ export default function Scene3Rush() {
             </g>
           </svg>
           {/* ...and this one rides in front of them. */}
-          <Word w={words[2]} className="top-[44svh] left-[76%]" tone="text-glow [-webkit-text-stroke:3px_var(--ink)]" />
+          <Word w={words[2]} className="top-[52svh] left-[76%]" tone="text-glow [-webkit-text-stroke:3px_var(--ink)]" />
         </div>
+        <Art data-city>
+          <Figure pose="hold-high" transform="translate(880 870) scale(0.75)" />
+          <g data-child-crossing style={storyVars}>
+            <Figure pose="walk" transform="translate(720 870) scale(0.55)" />
+            <path d="M701 792h24v30h-24z" className="fill-accent" />
+          </g>
+        </Art>
         {/* Reduced motion: the track never pans, so the three words are stacked in view instead. */}
-        <div className="absolute inset-x-0 top-[44svh] hidden flex-wrap gap-x-8 px-(--gutter) motion-reduce:flex">
+        <div data-city className="absolute inset-x-0 top-[50svh] hidden flex-wrap gap-x-8 px-(--gutter) motion-reduce:flex">
           {words.map((w) => (
             <p key={w.en} data-word-static lang="bn" className="font-chunky text-display font-extrabold text-ink">
               {w.bn} <span lang="en" className="text-label font-medium uppercase">{w.en}</span>
@@ -126,6 +158,16 @@ export default function Scene3Rush() {
           ))}
         </div>
         <SceneText time={COPY.time} line={COPY.line} />
+        <CloseBeat label="A half-full chai glass held above the passing crowd; the tea stays level.">
+          <CloseArt>
+            <path d="M250 650 295 341 347 297 367 650Z" fill="var(--story-shawl)" />
+            <g transform="translate(414 250) scale(2.1)"><Cup state="half" /></g>
+            <path d="M307 348 315 267Q320 239 340 246L359 256 358 282 343 277 340 332Z" fill="var(--story-skin)" />
+            <path d="M355 258 420 253 425 267 363 273Z" fill="var(--story-skin)" />
+            {[140, 210, 570, 645].map((x) => <Figure key={x} pose="walk" transform={`translate(${x} 600) scale(0.75)`} opacity="0.3" />)}
+          </CloseArt>
+          <FigureLine line={COPY.close} />
+        </CloseBeat>
       </Stage>
     </div>
   );

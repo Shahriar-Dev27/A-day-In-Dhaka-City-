@@ -22,11 +22,11 @@ export interface Line {
 }
 
 interface TimelineOptions {
-  /** Default text beats (time chip, then Bangla+English line) fade in mid-scene. */
+  close?: boolean;
+  returnToCity?: boolean;
+  /** Wide-shot text (time chip, then Bangla+English line) leaves before the close. */
   text?: boolean;
-  /** Keep the text on screen to the end of the slot (last scene). */
-  hold?: boolean;
-  /** ScrollTrigger range. Default starts as the slot top reaches 70% of the viewport, so a 150svh slot scrubs over 120svh, not 50. */
+  /** A 200svh slot scrubs over 170svh, starting as its top reaches 70% of the viewport. */
   start?: string;
   end?: string;
 }
@@ -38,8 +38,8 @@ interface TimelineOptions {
  */
 export function useSceneTimeline(
   root: RefObject<HTMLDivElement | null>,
-  build: (tl: gsap.core.Timeline, mode: SceneMode, q: Select) => void,
-  { text = true, hold = false, start = "top 70%", end = "bottom bottom" }: TimelineOptions = {},
+  build: (tl: gsap.core.Timeline, mode: SceneMode, q: Select) => void | (() => void),
+  { text = true, close = false, returnToCity = true, start = "top 70%", end = "bottom bottom" }: TimelineOptions = {},
 ) {
   useGSAP(
     () => {
@@ -61,12 +61,26 @@ export function useSceneTimeline(
           // from-state to the first target until the playhead reaches the rest, which flashed beat 2.
           gsap.set(beats, { autoAlpha: 0, ...(move && { y: 16 }) });
           // Timing is mirrored by BEAT_IN / BEAT_OUT_END in lib/scenes.ts (sky holds while text shows).
-          tl.to(beats, { autoAlpha: 1, ...(move && { y: 0 }), duration: 0.16, ease: "power2.out", stagger: 0.06 }, BEAT_IN);
-          if (!hold)
-            tl.to(beats, { autoAlpha: 0, ...(move && { y: -12 }), duration: 0.14, ease: "power2.out", stagger: 0.03 }, 0.74);
+          tl.to(beats, { autoAlpha: 1, ...(move && { y: 0 }), duration: 0.06, ease: "power2.out", stagger: 0.02 }, BEAT_IN);
+          tl.to(beats, { autoAlpha: 0, ...(move && { y: -12 }), duration: 0.06, ease: "power2.out", stagger: 0.02 }, 0.28);
         }
-        build(tl, mode, q);
+        if (close) {
+          const move = mode === "full";
+          const city = q("[data-city]");
+          const detail = q("[data-close]");
+          const lines = q("[data-beat-close]");
+          gsap.set(detail, { autoAlpha: 0, ...(move && { scale: 1.08 }) });
+          if (lines.length) gsap.set(lines, { autoAlpha: 0 });
+          tl.to(city, { autoAlpha: 0, ...(move && { scale: 1.12 }), duration: 0.1 }, 0.36)
+            .to(detail, { autoAlpha: 1, ...(move && { scale: 1 }), duration: 0.1 }, 0.36);
+          if (lines.length) tl.to(lines, { autoAlpha: 1, duration: 0.04, stagger: 0.02 }, 0.5)
+            .to(lines, { autoAlpha: 0, duration: 0.04, stagger: 0.02 }, 0.62);
+          if (returnToCity) tl.to(detail, { autoAlpha: 0, ...(move && { scale: 1.08 }), duration: 0.1 }, 0.7)
+            .to(city, { autoAlpha: 1, ...(move && { scale: 1 }), duration: 0.1 }, 0.7);
+        }
+        const cleanup = build(tl, mode, q);
         if (tl.duration() < 1) tl.set({}, {}, 1);
+        return cleanup;
       });
       return () => mm.revert();
     },

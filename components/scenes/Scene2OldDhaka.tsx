@@ -1,12 +1,15 @@
 "use client";
 
 import { useRef } from "react";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { EASE, SCENES } from "@/lib/scenes";
-import { SceneText, Stage, useSceneTimeline, type Line } from "./scene-kit";
+import { Art, SceneText, Stage, useSceneTimeline, type Line } from "./scene-kit";
+import { CloseArt, CloseBeat, Cup, Figure, FigureLine, TeaStall } from "./story-kit";
 
 const COPY = {
   time: { bn: "সকাল ৭টা", en: "7:00 AM" } satisfies Line,
   line: { bn: "চায়ের কাপে শুরু হয় দিন", en: "The day begins in a cup of tea" } satisfies Line,
+  close: { bn: "পরে দিয়েন।", en: "Pay me later." } satisfies Line,
 };
 
 // Shopfronts along the lane: [x, width, height]
@@ -24,16 +27,21 @@ export default function Scene2OldDhaka() {
         return -(track.offsetWidth - window.innerWidth);
       };
       tl.fromTo(q("[data-track]"), { x: 0 }, { x: travel, duration: 1, ease }, 0);
-      tl.fromTo(q("[data-steam]"), { y: 0 }, { y: -60, stagger: 0.04, duration: 0.9, ease: "none" }, 0); // steam drifts up with scroll
+      tl.fromTo(q("[data-city] [data-steam]"), { y: 0 }, { y: -60, stagger: 0.02, duration: 0.5, ease: "none" }, 0);
+      tl.fromTo(q("[data-offer]"), { x: -70 }, { x: 0, duration: 0.12 }, 0.46);
+      tl.fromTo(q("[data-wave]"), { rotation: -15 }, { rotation: 15, transformOrigin: "100% 100%", duration: 0.12 }, 0.52);
+      const steam = gsap.to(q("[data-stall-steam]"), { y: -18, opacity: 0.1, duration: 2, repeat: -1, yoyo: true, paused: true, ease: "sine.inOut" });
+      ScrollTrigger.create({ trigger: root.current?.parentElement, start: "top bottom", end: "bottom top", onToggle: (s) => s.isActive ? steam.play() : steam.pause() });
+      tl.fromTo(q("[data-paratha]"), { y: 0, scaleY: 1 }, { y: -35, scaleY: -1, duration: 0.07 }, 0.2).to(q("[data-paratha]"), { y: 0, scaleY: 1, duration: 0.07 }, 0.27);
     } else {
       tl.fromTo(q("[data-steam]"), { autoAlpha: 0.2 }, { autoAlpha: 0.7, ease: "power2.out", duration: 0.5 }, 0);
     }
-  });
+  }, { close: true });
 
   return (
     <div ref={root} className="relative h-full">
       <Stage label={COPY.line.en}>
-        <div data-track className="absolute inset-y-0 left-0 w-[356svh]">
+        <div data-city data-track className="absolute inset-y-0 left-0 w-[356svh]">
           <svg aria-hidden="true" focusable="false" viewBox="0 0 3200 900" preserveAspectRatio="xMinYMax slice" className="h-full w-full">
             <rect x="0" y="700" width="3200" height="200" className="fill-ink" opacity="0.85" />
             {SHOPS.map(([x, w, h], i) => (
@@ -58,7 +66,26 @@ export default function Scene2OldDhaka() {
             ))}
           </svg>
         </div>
+        <Art data-city>
+          <TeaStall transform="translate(800 790) scale(0.85)" />
+          <Figure pose="walk" transform="translate(950 872) scale(0.9)" />
+          <Figure pose="sit" transform="translate(630 870) scale(0.75)" />
+        </Art>
         <SceneText time={COPY.time} line={COPY.line} />
+        <CloseBeat label="The seller hands over a steaming chai glass and waves away payment.">
+          <CloseArt>
+            <path d="M60 425 276 335 312 392 110 496Z" fill="var(--story-gold)" />
+            <path d="M740 475 510 340 468 387 701 530Z" fill="var(--story-shawl)" />
+            <g data-offer>
+              <path d="M265 341q72-30 93-7l30 28-13 17-34-18-45 42Z" fill="var(--story-skin)" />
+              <g transform="translate(400 310) scale(2)"><Cup state="full" /></g>
+            </g>
+            <path d="M489 347 454 306 442 304 437 319 469 362 454 393 477 402 516 370Z" fill="var(--story-skin)" />
+            <path data-wave d="M204 247 196 192 209 183 217 215 232 175 245 183 234 231 263 215 271 229 228 269Z" fill="var(--story-skin)" />
+            <path d="M55 490H745V525H55Z" fill="var(--story-glass)" opacity="0.35" />
+          </CloseArt>
+          <FigureLine line={COPY.close} spoken />
+        </CloseBeat>
       </Stage>
     </div>
   );

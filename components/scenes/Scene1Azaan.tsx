@@ -15,17 +15,24 @@
 
 import { useRef, type CSSProperties } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { palette, scene1Vars, toCssVarObject } from "@/lib/palette";
+import { cssVars, palette, scene1Vars, toCssVarObject } from "@/lib/palette";
 import { EASE, SCENES, type SceneProps } from "@/lib/scenes";
 import { Art, SceneText, Stage, useSceneTimeline, type Line } from "./scene-kit";
+import { CloseArt, CloseBeat, Dog, Figure, FigureLine } from "./story-kit";
+import { storyVars } from "@/lib/palette";
 import { BASE, BOAT, FAR_PATH, FOG_BLOBS, FOG_LAYERS, GLINT_PATH, MID_PATH, RIPPLE_PATH, STAR_PATHS, WINDOW_GROUPS } from "./scene1-art";
 
 const COPY = {
   time: { bn: "ভোর ৪:৪৫", en: "4:45 AM" } satisfies Line,
   line: { bn: "আজানের সুরে ঢাকা জাগে", en: "Dhaka wakes to the call of prayer" } satisfies Line,
+  close: { bn: "ঠান্ডা। এক কাপ চা দরকার।", en: "Cold. I need a cup of tea." } satisfies Line,
 };
 
-const ROOT_VARS = { ...toCssVarObject(palette[1]), ...scene1Vars } as CSSProperties;
+// --sky-top/--sky-bottom are dropped so the river and dawn gradients keep following the global sky.
+const PINNED_VARS = Object.fromEntries(
+  Object.entries(toCssVarObject(palette[1])).filter(([k]) => k !== cssVars.skyTop && k !== cssVars.skyBottom),
+);
+const ROOT_VARS = { ...PINNED_VARS, ...scene1Vars } as CSSProperties;
 // Same noise tile as app/globals.css (feTurbulence, rasterised once as an image, no runtime filter).
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -89,14 +96,16 @@ export default function Scene1Azaan({ tier }: SceneProps) {
         });
       }
     }
-  });
+    tl.fromTo(q("[data-dog-arrival]"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.2);
+    if (mode === "full") tl.fromTo(q("[data-dog-arrival]"), { x: 65 }, { x: 0, duration: 0.14, ease: "power2.out" }, 0.12);
+  }, { close: true });
 
   return (
     <div ref={root} className="relative h-full" style={ROOT_VARS}>
       <Stage label={COPY.line.en}>
         {/* Scrim behind the art: deepens the sky where the text sits so copy keeps >= 4.5:1 over stars. */}
         <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[58svh] bg-linear-to-b from-transparent from-0% via-ink/40 via-32% to-transparent to-100%" />
-        <Art>
+        <Art data-city>
           <defs>
             <linearGradient id="s1-water" gradientUnits="userSpaceOnUse" x1="0" y1={BASE} x2="0" y2="900">
               <Stop at={0} color="var(--sky-bottom)" />
@@ -221,9 +230,25 @@ export default function Scene1Azaan({ tier }: SceneProps) {
               )}
             </g>
           ))}
+          <g style={storyVars}>
+            <path d="M590 900V865Q790 810 1030 865V900Z" className="fill-ink" />
+            <Figure pose="cold" transform="translate(775 885) scale(0.95)" />
+            <g data-dog-arrival><Dog transform="translate(892 885) scale(0.75)" /></g>
+          </g>
         </Art>
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{ backgroundImage: GRAIN, maskImage: GRAIN_MASK, WebkitMaskImage: GRAIN_MASK }} />
         <SceneText time={COPY.time} line={COPY.line} />
+        <CloseBeat label="Cold hands held together, with no tea yet. A dog waits beside them.">
+          <CloseArt>
+            <path d="M130 630 185 350 310 270 400 304 489 270 615 350 670 630Z" fill="var(--story-cloth)" />
+            <path d="M185 350 310 270 400 304 489 270 615 350 531 410 268 410Z" fill="var(--story-shawl)" />
+            <path d="M200 490 289 389 369 360M600 490 511 389 433 360" fill="none" stroke="var(--story-shawl)" strokeWidth="70" strokeLinecap="round" />
+            <path d="M346 371 375 328 398 337 387 383M451 372 424 328 402 338 414 384" fill="var(--story-skin)" />
+            <path data-steam d="M390 298Q367 275 390 251M416 292Q442 267 420 247" fill="none" stroke="var(--story-copy)" strokeWidth="3" opacity="0.3" />
+            <Dog transform="translate(612 600) scale(1.2)" />
+          </CloseArt>
+          <FigureLine line={COPY.close} />
+        </CloseBeat>
       </Stage>
     </div>
   );
