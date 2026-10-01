@@ -1,161 +1,145 @@
 <div align="center">
 
-# 🌇 A Day in Dhaka
+<p><strong>DHAKA, BANGLADESH · 04:45—23:45</strong></p>
 
-### One scroll, one day.
+# A Day in Dhaka
 
-From the 4:45 AM azaan on the Buriganga to a quiet midnight street —
-a scroll-driven storytelling experience built as a design-heavy portfolio piece.
+<p lang="bn">একটি দিন, ঢাকায়</p>
+
+### One city. One day. A cup of tea.
+
+A scroll through the changing light, streets, and small rituals of Dhaka.<br>
+From the first azaan on the Buriganga to the last pool of lamplight.
 
 <p>
-  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=next.js&logoColor=white">
-  <img alt="React" src="https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white">
-  <img alt="Three.js" src="https://img.shields.io/badge/Three.js-0.186-000000?style=for-the-badge&logo=three.js&logoColor=white">
+  <a href="#watch-the-day">Watch the day</a> ·
+  <a href="#the-experience">The experience</a> ·
+  <a href="#run-locally">Run locally</a> ·
+  <a href="#inside-the-project">Explore the code</a>
 </p>
 
 <p>
-  <a href="#about">About</a> •
-  <a href="#the-journey">The Journey</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#project-structure">Structure</a> •
-  <a href="#design-conventions">Design Conventions</a> •
-  <a href="#credits">Credits</a>
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-171717?style=flat-square&amp;logo=next.js&amp;logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-171717?style=flat-square&amp;logo=react&amp;logoColor=61DAFB">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-171717?style=flat-square&amp;logo=typescript&amp;logoColor=3178C6">
+  <img alt="GSAP" src="https://img.shields.io/badge/GSAP-171717?style=flat-square&amp;logo=gsap&amp;logoColor=88CE02">
 </p>
 
 </div>
 
----
+## Watch the day
 
-## About
+[![Animated walkthrough of A Day in Dhaka, from the dawn title and Old Dhaka tea stall to golden hour and the quiet night street. Click to open the full MP4.](./docs/media/a-day-in-dhaka-preview.gif)](./docs/media/a-day-in-dhaka.mp4)
 
-**A Day in Dhaka** turns a single vertical scroll into a full day in Dhaka, Bangladesh. Light, color, sound cues, and pace shift with every scene, carried by one recurring thread: a cup of tea passed between strangers from dawn to midnight.
+**[Watch the full video →](./docs/media/a-day-in-dhaka.mp4)** · 20.5 seconds · 1080p MP4
 
-> 🫖 **The throughline:** a tea cup travels hand to hand across all eight scenes — the one constant as the city changes around it.
+The preview above is a lightweight animation. Open the MP4 for the original recording and audio.
 
-## The Journey
+## The experience
 
-The experience moves through eight scenes, each with its own light, motion, and emotional register:
+**A Day in Dhaka** is an illustrated, scroll-driven story. A recurring tea glass connects eight scenes as the city moves from blue dawn through warm morning, the rush of traffic, and neon evening to a quiet street at night.
 
-<table>
-<tr><th>#</th><th>Time</th><th>Scene</th><th>Mood</th></tr>
-<tr><td>0</td><td>—</td><td>🌅 Sunrise Dot <em>(loader/intro)</em></td><td>Quiet anticipation</td></tr>
-<tr><td>1</td><td>4:45 AM</td><td>🕌 Azaan on the Buriganga</td><td>Stillness, reverence</td></tr>
-<tr><td>2</td><td>7:00 AM</td><td>🍵 Old Dhaka Wakes</td><td>Warmth, appetite, community</td></tr>
-<tr><td>3</td><td>9:00 AM</td><td>🚦 The Rush <em>(hero scene)</em></td><td>Energy, chaos, joy</td></tr>
-<tr><td>4</td><td>1:00 PM</td><td>☀️ Noon Heat</td><td>Intensity, slowness</td></tr>
-<tr><td>5</td><td>4:30 PM</td><td>🕊️ Golden Hour</td><td>Freedom, nostalgia</td></tr>
-<tr><td>6</td><td>7:30 PM</td><td>🌃 Neon Evening</td><td>Wonder, electricity</td></tr>
-<tr><td>7</td><td>11:45 PM</td><td>🌙 Quiet City</td><td>Peace, a soft goodbye</td></tr>
-</table>
+- **You set the pace.** Scroll-linked timelines carry the story forward and backward; an on-screen clock follows the day.
+- **Two languages, one story.** Bangla headlines and English subtitles share each scene.
+- **Light tells the time.** A shared palette shifts the sky, illustrations, and typography as the day unfolds.
+- **Motion adapts.** Reduced-motion support, lazy-loaded scenes, and device-aware effects keep the experience accessible across devices.
 
-Full scene-by-scene direction (camera layers, motion, Bangla/English copy, sound, the tea-cup continuity thread) lives in [`SCRIPT.md`](./SCRIPT.md). The original build plan and phase checklist is in [`A-Day-in-Dhaka-PLAN.md`](./A-Day-in-Dhaka-PLAN.md).
+### A city in eight scenes
 
-## Tech Stack
+| Scene | Time | Setting |
+| :--- | :--- | :--- |
+| **00 · Sunrise Dot** | Before dawn | A single point of light opens the story. |
+| **01 · Azaan on the Buriganga** | 4:45 AM | River, boats, mist, and the waking skyline. |
+| **02 · Old Dhaka Wakes** | 7:00 AM | A tea stall and the warmth of morning. |
+| **03 · The Rush** | 9:00 AM | Traffic, crowds, and a city in motion. |
+| **04 · Noon Heat** | 1:00 PM | The day slows under the afternoon sun. |
+| **05 · Golden Hour** | 4:30 PM | Rooftops, pigeons, and the evening sky. |
+| **06 · Neon Evening** | 7:30 PM | City lights and scroll-responsive trails. |
+| **07 · Quiet City** | 11:45 PM | A resting street and one warm lamp. |
 
-<table>
-<tr><th>Area</th><th>Choice</th></tr>
-<tr><td>Framework</td><td><a href="https://nextjs.org/">Next.js</a> (App Router) + TypeScript</td></tr>
-<tr><td>Styling</td><td><a href="https://tailwindcss.com/">Tailwind CSS v4</a> + CSS variables for the time-of-day palette</td></tr>
-<tr><td>Smooth scroll</td><td><a href="https://github.com/darkroomengineering/lenis">Lenis</a></td></tr>
-<tr><td>Animation</td><td><a href="https://gsap.com/">GSAP</a> + ScrollTrigger</td></tr>
-<tr><td>3D / shaders</td><td><a href="https://docs.pmnd.rs/react-three-fiber">React Three Fiber</a> + drei (fog, light trails)</td></tr>
-<tr><td>Illustration</td><td>Hand-authored inline SVG, animated with GSAP</td></tr>
-<tr><td>Hosting</td><td><a href="https://vercel.com/">Vercel</a></td></tr>
-</table>
+Read the [story script](./SCRIPT.md) for the scene direction and tea-glass continuity.
 
-## Getting Started
+## Built with
 
-Requires **Node.js 18.18+** (Next.js 16) and **npm**.
+| Layer | Tools | Purpose |
+| :--- | :--- | :--- |
+| Application | Next.js 16 App Router · React 19 · TypeScript | Page shell, metadata, and scene components |
+| Styling | Tailwind CSS 4 · CSS custom properties | Responsive layouts and time-of-day color tokens |
+| Motion | GSAP · ScrollTrigger · Lenis | Scene timelines and smooth scrolling |
+| Illustration | Inline SVG · Canvas 2D | City artwork, recurring characters, and the pigeon flock |
+| Light effects | Three.js · React Three Fiber · drei · GLSL | Enhanced evening trails on supported devices |
+| Typography | Noto Serif Bengali · Hind Siliguri · Baloo Da 2 | Bengali display text, subtitles, and the clock |
+
+## Run locally
+
+Use **Node.js 24** and **npm** to run the app and its tests. The application requires Node.js **20.9+**; the tests import TypeScript directly and use Node's native type stripping.
 
 ```bash
-# clone & install
-git clone https://github.com/<your-username>/a-day-in-dhaka.git
+git clone https://github.com/Shahriar-Dev27/A-day-In-Dhaka-City-.git a-day-in-dhaka
 cd a-day-in-dhaka
-npm install
-
-# start the dev server
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and scroll.
+Open [localhost:3000](http://localhost:3000), then scroll to begin. Development mode includes scene-jump controls for inspecting individual scenes.
+
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create the production build |
+| `npm run start` | Serve the production build after building |
+| `npm run lint` | Run ESLint |
+| `npx tsc --noEmit` | Check TypeScript types |
+| `npm test` | Check scene timing, palettes, and text contrast |
+
+Fonts are downloaded through `next/font/google` at build time and served locally at runtime. A fresh build needs access to Google Fonts.
+
+For production, set `NEXT_PUBLIC_SITE_URL` to the site's public origin so social metadata uses the correct URL. On Vercel, `VERCEL_PROJECT_PRODUCTION_URL` is used as a fallback.
+
+## Inside the project
 
 <details>
-<summary><strong>📜 Available scripts</strong></summary>
-<br>
+<summary><strong>Architecture and file map</strong></summary>
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start the Next.js dev server |
-| `npm run build` | Production build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run the test suite (`node --test`) |
-
-</details>
-
-## Project Structure
-
-<details open>
-<summary><strong>📁 Expand file tree</strong></summary>
-
-```
-app/
-  layout.tsx              # root layout, fonts, metadata, default palette
-  page.tsx                # mounts <Experience />
-  globals.css             # grain texture, CSS variable theme
-  icon.svg / apple-icon.tsx / opengraph-image.tsx
-
+```text
+app/                      Page shell, metadata, styles, and error pages
 components/
-  Experience.tsx          # Lenis + GSAP master timeline setup
-  Loader.tsx
-  ClockProgress.tsx        # sun/clock UI tied to scroll progress
-  QuietPage.tsx
+  Experience.tsx          Scene loading, master sky timeline, and clock
+  ClockProgress.tsx       Scroll-linked time display
+  Loader.tsx              Initial loading state
   scenes/
-    Scene0Intro.tsx … Scene7Midnight.tsx
-    scene-kit.tsx          # shared scene scaffolding / timeline hook
-    story-kit.tsx           # recurring stroller + tea-cup state art
-    LightTrails.tsx          # Scene 6 light-trail shader wrapper
-    PigeonSwarm.tsx           # Scene 5 pigeon flock (Canvas2D)
-
-shaders/
-  lightTrail.ts            # GLSL for the Scene 6 light-trail effect
-
+    Scene0Intro.tsx       Opening title
+    Scene1Azaan.tsx …     Individual story scenes through midnight
+    scene-kit.tsx         Shared scene layout and timeline behavior
+    story-kit.tsx         Recurring characters and tea-glass artwork
+    PigeonSwarm.tsx       Canvas 2D flock
+    LightTrails.tsx       Evening shader wrapper
 lib/
-  gsap.ts                  # GSAP plugin registration
-  scroll.ts                # Lenis + ScrollTrigger sync
-  palette.ts                # time-of-day color tokens
-  scenes.ts                 # scene metadata, scroll offsets, clock mapping
-  fonts.ts                  # self-hosted Google fonts (next/font)
-  device.ts                 # device-tier detection (high/low)
-
-docs/
-  assets.md                 # asset & licence log
-  superpowers/               # design specs & plans
-
-tests/
-  lib.test.mjs
+  scenes.ts               Scene registry, scroll offsets, and clock mapping
+  palette.ts              Scene palettes and shared color tokens
+  scroll.ts               Lenis and ScrollTrigger coordination
+  gsap.ts                 Animation setup and motion preferences
+  device.ts               Device-tier detection
+  fonts.ts                Bengali and Latin font configuration
+shaders/lightTrail.ts     Evening light-trail shader
+tests/lib.test.mjs        Shared contract and contrast checks
+docs/assets.md           Asset sources and licence log
+docs/media/              README walkthrough and animated preview
+SCRIPT.md                 Story and scene direction
 ```
+
+Each scene owns its animation timeline. Shared scene metadata controls scroll length and clock anchors; palette tokens drive the changing sky. Scenes beyond the introduction and dawn load as they approach the viewport.
+
+To inspect the lighter rendering path, open [localhost:3000/?tier=low](http://localhost:3000/?tier=low). Enable reduced motion in your operating system or browser to inspect the motion-reduced experience.
 
 </details>
 
-## Design Conventions
-
-- 🎬 One component per scene; each owns its GSAP timeline and cleans up on unmount (`gsap.context` + `ctx.revert()`)
-- 🖱️ All story motion is driven by `ScrollTrigger` scrub — no timers
-- 🎨 Scene colors come from `lib/palette.ts` CSS variables; never hardcoded in components
-- ♿ Every scene has a `prefers-reduced-motion` path (opacity-only, no parallax) while keeping all story text present
-- ⚡ Device tiering (`lib/device.ts`) scales effects down (e.g. pigeon count, shader usage) on lower-end hardware
-
-## Credits
+---
 
 <div align="center">
 
-Designed and built by **Shahriar Islam Dip**
-
-Asset sourcing and licensing details are tracked in [`docs/assets.md`](./docs/assets.md) — fonts are self-hosted via `next/font/google` (SIL OFL); illustration and shader work is original to this project.
+Designed and built by **[Shahriar Islam Dip](https://github.com/Shahriar-Dev27)**.<br>
+Illustration and shader work are original to this project.<br>
+See the [asset and licence log](./docs/assets.md) for sources and attribution.
 
 </div>
-</content>

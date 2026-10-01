@@ -42,3 +42,12 @@ next-env.d.ts
 
 # serena (editor/tool cache)
 .serena/
+
+
+/.claude/
+/.devteam/
+/.kilo/
+/docs/superpowers/
+/A-Day-in-Dhaka-PLAN.md
+/AGENTS.md
+/CLAUDE.md
