@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/*
+  Time-of-day tokens (--sky-top, --sky-bottom, --ink, --accent, --glow, --text, --text-muted)
+  are defined in lib/palette.ts, defaulted on <html> by app/layout.tsx and rewritten only by
+  Experience's global sky timeline. Never hardcode scene colours; use the utilities below.
+*/
+@theme inline {
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-glow: var(--glow);
+  --color-copy: var(--text);
+  --color-copy-muted: var(--text-muted);
+
+  --font-display: var(--font-bn-display), "Noto Serif Bengali", ui-serif, Georgia, serif;
+  --font-sans: var(--font-ui), "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-chunky: var(--font-chunky), "Baloo Da 2", system-ui, sans-serif;
+
+  /*
+    Type scale (rem + vw so it still grows under browser zoom; rem bounds are the floor/ceiling).
+    Bangla needs tall line boxes for matras/conjuncts and no letter-spacing, so display steps
+    run 1.2-1.3 line-height where Latin would use ~1.05.
+  */
+  --text-giant: clamp(5rem, 1.5rem + 22vw, 20rem); /* scene 3 words, chunky face */
+  --text-giant--line-height: 1.05;
+  --text-display: clamp(2.75rem, 1.4rem + 6vw, 6.25rem); /* title */
+  --text-display--line-height: 1.2;
+  --text-line: clamp(1.75rem, 1.2rem + 2.6vw, 3.5rem); /* per-scene Bangla line */
+  --text-line--line-height: 1.3;
+  --text-sub: clamp(1rem, 0.9rem + 0.45vw, 1.25rem); /* English subtitle */
+  --text-sub--line-height: 1.5;
+  --text-clock: clamp(1.125rem, 1rem + 0.6vw, 1.5rem); /* time chips, clock readout */
+  --text-clock--line-height: 1.2;
+  --text-label: 0.8125rem; /* small uppercase Latin labels */
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.14em;
+
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:root {
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+}
+
+html {
+  /* Sky fills any overscroll area instead of flashing white. */
+  background: var(--sky-bottom);
+  color: var(--text);
+  scroll-behavior: auto; /* Lenis owns smooth scrolling; native stays instant */
+  overflow-x: clip; /* clip, not hidden: hidden would break position: sticky stages */
+  text-size-adjust: 100%;
+}
+
+html.scroll-locked {
+  overflow: hidden;
+}
+
+body {
+  min-height: 100svh;
+  overflow-x: clip;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* One continuous sky. A fixed layer (not background-attachment) so mobile Safari doesn't repaint it. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+}
+
+/* Flat-vector-with-grain direction: static noise, no animation, no blend mode. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:lang(bn) {
+  letter-spacing: 0; /* tracking breaks Bengali conjuncts */
+}
+
+::selection {
+  background: var(--glow);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* Shared one-shot entrance for the quiet pages (404/error). Default state is visible. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 280ms var(--ease-out-strong) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+  .lamp-breathe {
+    animation: lamp-breathe 4.8s ease-in-out infinite;
+  }
+  .scroll-prompt {
+    animation: scroll-prompt 2.4s ease-in-out infinite;
+    transform-origin: top;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes lamp-breathe {
+  50% {
+    opacity: 0.72;
+  }
+}
+@keyframes scroll-prompt {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* Pressable: scale(0.96) feedback, gated for touch false-hovers and reduced motion. */
+.btn {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+.btn-solid {
+  background: var(--glow);
+  color: var(--ink);
+}
+.btn-ghost {
+  border: 1px solid color-mix(in oklab, var(--text) 45%, transparent);
+  color: var(--text);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-solid:hover {
+    background: var(--text);
+  }
+  .btn-ghost:hover {
+    background: color-mix(in oklab, var(--text) 12%, transparent);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      transform 160ms ease-out;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+}
+
+/*
+  Masked word reveal (components/scenes/scene-kit.tsx SplitWords, animated by Loader).
+  The padding/margin pair gives Bengali below-base marks room inside the clip box without
+  changing layout; the mask is only ever one word wide, so lines still wrap normally.
+*/
+.split-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+.split-word {
+  display: inline-block;
+}
+
+/*
+  Reduced motion gets no opening veil at all, including in the pre-hydration paint.
+  components/Loader.tsx exits immediately in that mode, so nothing else depends on it.
+*/
+@media (prefers-reduced-motion: reduce) {
+  [data-preloader] {
+    display: none;
+  }
+}
