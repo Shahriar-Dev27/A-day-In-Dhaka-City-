@@ -1,0 +1,70 @@
+/*
+  Scene 8 (ঘুমায় শহর): scene-local rules. Every colour is a mix of the shared tokens (sky timeline vars,
+  --slip-*, --accent, --glow); no hex. Imported by Scene8Closing only.
+*/
+
+/* The shop signs are dark at midnight, and the stove is cold: no flame, no steam. */
+.closing [data-sign] {
+  opacity: 0.5;
+}
+.closing [data-flame] {
+  display: none;
+}
+
+/* The credit: a printed caption in a hairline frame, in the narration's top-left band. */
+.credit-frame {
+  display: inline-block;
+  padding: 0.75rem 1rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--text) 55%, transparent);
+}
+.credit-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
+/*
+  The restart button is a slip of printed paper like the speech slips and the clock ticket (fixed paper
+  pair, 13.78:1, independent of the sky), square-cornered, with the same 2px misregistered accent plate.
+  Hover/press move the plate, never the layout; the global :focus-visible ring (text colour, 3px offset)
+  stays on top of it.
+*/
+.restart {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  padding: 0.5rem 1.25rem;
+  background: var(--slip-bg);
+  color: var(--slip-fg);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 var(--accent);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    box-shadow 150ms ease-out,
+    translate 150ms ease-out;
+}
+.restart-arrow {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .restart:hover {
+    box-shadow: 4px 4px 0 var(--accent);
+    translate: -1px -1px;
+  }
+}
+.restart:active {
+  box-shadow: 1px 1px 0 var(--accent);
+  translate: 1px 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .restart {
+    transition: none;
+  }
+}

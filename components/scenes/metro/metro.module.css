@@ -1,0 +1,149 @@
+/*
+  Scene 4 (Metro): derived tones and ambient loops. Tones are mixes of tokens only (no hex): the
+  --metro-* livery vars are set on the scene root from lib/palette.ts (metroVars), the --cue-* hues
+  and the sky/ink/wall vars come from <html>/.stage. Loops are transform/opacity on their own inner
+  elements (GSAP owns the parent groups) and pause when the scene root is data-live="false".
+*/
+.root {
+  --cabin: color-mix(in oklab, var(--metro-body) 92%, var(--ink));
+  --cabin-dark: color-mix(in oklab, var(--metro-body) 74%, var(--ink));
+  --cabin-deep: color-mix(in oklab, var(--metro-body) 50%, var(--ink));
+  --seat: color-mix(in oklab, var(--cue-uniform) 55%, var(--metro-body));
+  --seat-dark: color-mix(in oklab, var(--cue-uniform) 70%, var(--ink));
+  --floor: color-mix(in oklab, var(--metro-floor) 78%, var(--metro-body));
+  --glass: color-mix(in oklab, var(--cue-uniform) 20%, var(--sky-bottom));
+  --glass-haze: color-mix(in oklab, var(--sky-bottom) 78%, var(--metro-body));
+  --bus-a: color-mix(in oklab, var(--cue-uniform) 70%, var(--ink));
+  --bus-b: color-mix(in oklab, var(--cue-notebook) 72%, var(--ink));
+  --bus-c: color-mix(in oklab, var(--cue-khaki) 70%, var(--ink));
+  --bus-d: color-mix(in oklab, var(--cue-cng) 70%, var(--ink));
+  --bus-e: color-mix(in oklab, var(--cue-cap) 70%, var(--ink));
+  --rick: color-mix(in oklab, var(--cue-rickshaw) 76%, var(--ink));
+  --glare: color-mix(in oklab, var(--sky-bottom) 86%, var(--glow));
+  /* the route panel is a light printed plate (was a heavy dark slab): ink text on it is >= 8:1 */
+  --housing: color-mix(in oklab, var(--metro-body) 82%, var(--ink));
+  --led: color-mix(in oklab, var(--ink) 88%, var(--cabin));
+}
+
+/* The roar ducks: horn marks over the road breathe until the train takes over (timeline fades them). */
+.horn {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.strap {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+.vent {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+.hum {
+  transform-box: fill-box;
+}
+.blink {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .horn {
+    animation: horn 0.9s ease-in-out infinite alternate;
+  }
+  .strap {
+    animation: sway 3.6s ease-in-out infinite alternate;
+  }
+  .vent {
+    animation: vent 2.6s ease-in-out infinite alternate;
+  }
+  /* the soft rail hum: half a unit of vertical shiver, on the whole train body */
+  .hum {
+    animation: hum 0.36s ease-in-out infinite alternate;
+  }
+  .blink {
+    animation: blink 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes horn {
+  from {
+    transform: scale(0.9);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+@keyframes sway {
+  from {
+    transform: rotate(-2.4deg);
+  }
+  to {
+    transform: rotate(2.4deg);
+  }
+}
+@keyframes vent {
+  from {
+    transform: scaleY(0.96) translateX(-2px);
+    opacity: 0.55;
+  }
+  to {
+    transform: scaleY(1.04) translateX(2px);
+    opacity: 0.9;
+  }
+}
+@keyframes hum {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(0.7px);
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* The ceiling route display: ink text over the printed strip. Real DOM text (announcement). */
+.led {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - (900 - 108) * var(--u));
+  width: min(34rem, calc(100vw - 2.5rem));
+  translate: -50% 0;
+  padding: 0.3rem 0.9rem 0.35rem;
+  color: var(--led);
+  text-align: center;
+}
+
+/*
+  Background passengers dim by mixing toward a mid slate, NOT by opacity (translucent ink over the bright
+  wall read as grey ghosts). --dim 0 = full silhouette, 100 = "away"; GSAP tweens --dim per passenger.
+  Only the classes the cast uses are listed; every fill stays solid.
+*/
+.root :global([data-pax]) {
+  --dim: 100; /* everyone starts dimmed; the timeline brings each beat's subject forward */
+  --away: color-mix(in oklab, var(--cabin-deep) 52%, var(--ink));
+  --fade: calc(var(--dim) * 1%);
+}
+.root :global([data-pax="boy"]) { --dim: 0; }
+.root :global([data-pax] .fill-ink) { fill: color-mix(in oklab, var(--ink), var(--away) var(--fade)); }
+.root :global([data-pax] .stroke-ink) { stroke: color-mix(in oklab, var(--ink), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-cap) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-cap) 80%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-uniform) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-uniform) 78%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-notebook) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-notebook) 85%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-dupatta) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-dupatta) 82%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-khaki) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-khaki) 78%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-lanyard) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-lanyard) 80%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-lanyard-s) { stroke: color-mix(in oklab, color-mix(in oklab, var(--cue-lanyard) 80%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .cue-note) { fill: color-mix(in oklab, color-mix(in oklab, var(--cue-note) 85%, var(--ink)), var(--away) var(--fade)); }
+.root :global([data-pax] .fill-paper),
+.root :global([data-pax] .fill-wall-lit),
+.root :global([data-pax] .fill-glow) { fill: color-mix(in oklab, var(--cabin), var(--away) var(--fade)); }

@@ -1,0 +1,154 @@
+/*
+  Scene 3 (the jam): scene-local tokens, fills and ambient loops. Every colour is a mix of the shared
+  tokens (sky timeline vars, cue vars, .stage tones); no hex. Imported by Scene3Jam only, so Scene 4's
+  agent and globals.css stay untouched.
+  Rickshaw Magenta (--cue-rickshaw, fixed in lib/palette.ts) is this scene's loudest colour. It is NOT --accent: accent lerps
+  from Tarpaulin Blue to magenta across the slot, the rickshaws must be magenta from the first frame.
+*/
+.jam {
+  --ju: calc(100svh / 900);
+  --j-mag: color-mix(in oklab, var(--cue-rickshaw) 94%, var(--ink));
+  --j-mag-d: color-mix(in oklab, var(--cue-rickshaw) 62%, var(--ink));
+  --j-mag-soft: color-mix(in oklab, var(--cue-rickshaw) 70%, var(--sky-bottom));
+  --j-amber: color-mix(in oklab, var(--glow) 94%, var(--ink));
+  --j-amber-soft: color-mix(in oklab, var(--glow) 72%, var(--sky-bottom));
+  --j-cream: color-mix(in oklab, var(--cue-cap) 88%, var(--sky-bottom));
+  --j-blue: var(--tarp);
+  --j-khaki: color-mix(in oklab, var(--cue-khaki) 80%, var(--ink));
+  --j-cng: color-mix(in oklab, var(--cue-cng) 90%, var(--ink));
+  --j-cng-d: color-mix(in oklab, var(--cue-cng) 62%, var(--ink));
+  --j-cng-l: color-mix(in oklab, var(--cue-cng) 78%, var(--sky-bottom));
+  --j-bus-red: color-mix(in oklab, var(--cue-notebook) 70%, var(--wall));
+  --j-bus-blue: color-mix(in oklab, var(--cue-uniform) 64%, var(--wall));
+  --j-bus-olive: color-mix(in oklab, var(--cue-khaki) 62%, var(--wall));
+  --j-glass: color-mix(in oklab, var(--tarp) 28%, var(--sky-bottom));
+  --j-steel: color-mix(in oklab, var(--wall) 55%, var(--sky-bottom));
+  --j-foil: color-mix(in oklab, var(--cue-cap) 70%, var(--glow));
+  /* instance defaults (a <use> overrides these) */
+  --rk-body: var(--j-mag);
+  --rk-hood: var(--j-blue);
+  --rk-trim: var(--j-amber);
+  --rk-ink: var(--j-cream);
+  --bus: var(--j-bus-red);
+  --bus-2: var(--j-cream);
+  --shirt: var(--j-cream);
+}
+
+/* fills and strokes used inside the vehicle groups */
+.j-rk-body { fill: var(--rk-body); }
+.j-rk-body-d { fill: color-mix(in oklab, var(--rk-body) 70%, var(--ink)); }
+.j-rk-hood { fill: var(--rk-hood); }
+.j-rk-trim { fill: var(--rk-trim); }
+.j-rk-trim-s { stroke: var(--rk-trim); }
+.j-rk-ink { fill: var(--rk-ink); }
+.j-rk-ink-s { stroke: var(--rk-ink); }
+.j-bus { fill: var(--bus); }
+.j-bus-2 { fill: var(--bus-2); }
+.j-bus-d { fill: color-mix(in oklab, var(--bus) 62%, var(--ink)); }
+.j-glass { fill: var(--j-glass); }
+.j-steel { fill: var(--j-steel); }
+.j-steel-s { stroke: var(--j-steel); }
+.j-cng { fill: var(--j-cng); }
+.j-cng-d { fill: var(--j-cng-d); }
+.j-cng-s { stroke: var(--j-cng-l); }
+.j-cream { fill: var(--j-cream); }
+.j-helmet { fill: color-mix(in oklab, var(--cue-helmet) 85%, var(--ink)); }
+.j-shirt { fill: var(--shirt); }
+.j-plate-text { fill: var(--j-cream); }
+.s-cream { stroke: var(--j-cream); }
+.s-foil { stroke: var(--j-foil); }
+.j-mag-f { fill: var(--j-mag); }
+.j-amber-f { fill: var(--j-amber); }
+.j-blue-f { fill: var(--j-blue); }
+
+/* depth layers: GSAP translates these; they never take pointer events */
+.jam-layer { position: absolute; top: 0; left: 0; height: 100%; pointer-events: none; will-change: transform; }
+.jam-layer > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/*
+  Hand-painted boards (the giant spoken words). Real DOM text in the sign-painter face, sized with the
+  type token (--text-giant) but capped to 30svh, standing on a roof (bottom anchored in art units) so the
+  English subtitle plate is always a paper slip with its own contrast, never over a vehicle.
+*/
+.jam-board {
+  position: absolute;
+  left: calc(var(--x) * var(--ju));
+  bottom: calc((900 - var(--y)) * var(--ju));
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border: 0.14rem solid var(--ink);
+  background: var(--board);
+  color: var(--board-ink);
+  box-shadow: 0.3rem 0.3rem 0 var(--ink);
+}
+.jam-board::before,
+.jam-board::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 0.5rem;
+  height: calc(var(--leg, 30) * var(--ju));
+  background: var(--ink);
+}
+.jam-board::before { left: 14%; }
+.jam-board::after { right: 14%; }
+.jam-board-word {
+  font-family: var(--font-chunky);
+  font-weight: 800;
+  font-size: clamp(3.75rem, min(1.2rem + 14vw, 20svh), 17rem);
+  line-height: 1.12;
+  padding: 0.02em 0.2em 0.06em;
+  white-space: nowrap;
+  text-align: center;
+  letter-spacing: 0;
+}
+.jam-board-en {
+  background: var(--slip-bg);
+  color: var(--slip-fg);
+  border-top: 0.14rem solid var(--ink);
+  padding: 0.3rem 0.75rem;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+/* the banner hangs in front of the traffic and may wrap to two lines on a phone */
+.jam-board[data-hung] .jam-board-word { white-space: normal; max-width: 86vw; text-wrap: balance; font-size: clamp(3rem, min(1rem + 14vw, 19svh), 12rem); }
+/* the banner hangs in front of the traffic (near layer): no legs, two rope ties instead */
+.jam-board[data-hung]::before,
+.jam-board[data-hung]::after { height: calc(120 * var(--ju)); width: 0.18rem; bottom: 100%; top: auto; }
+
+/* reduced motion: the three words become one static printed row (the track never pans) */
+.jam-static { position: absolute; inset-inline: var(--gutter); top: 30svh; display: none; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: flex-start; }
+.jam-static .jam-board { position: relative; left: auto; bottom: auto; translate: none; }
+.jam-static .jam-board::before,
+.jam-static .jam-board::after { display: none; }
+.jam-static .jam-board-word { font-size: clamp(2.25rem, 1rem + 5vw, 5rem); }
+@media (prefers-reduced-motion: reduce) {
+  .jam-static { display: flex; }
+  .jam-layer .jam-board { display: none; }
+}
+
+/* ambient loops: exhaust puffs and the hero rickshaw's tassels; paused off-screen by [data-live=false] */
+.jam-puff { transform-box: fill-box; transform-origin: 100% 100%; opacity: 0; }
+.jam-tassel { transform-box: fill-box; transform-origin: 50% 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .jam-puff { animation: jam-puff 2.4s var(--ease-out-strong) infinite; }
+  .jam-puff:nth-child(2) { animation-delay: -0.8s; }
+  .jam-puff:nth-child(3) { animation-delay: -1.6s; }
+  .jam-tassel { animation: jam-tassel 0.9s ease-in-out infinite alternate; }
+}
+@keyframes jam-puff {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20% { opacity: 0.45; }
+  100% { opacity: 0; transform: translate(-46px, -34px) scale(1.7); }
+}
+@keyframes jam-tassel {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(5deg); }
+}

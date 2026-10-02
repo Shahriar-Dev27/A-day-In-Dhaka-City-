@@ -5,16 +5,17 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type Co
 import "lenis/dist/lenis.css";
 import { gsap, ScrollTrigger, useGSAP, MOTION_QUERIES, prefersReducedMotion } from "@/lib/gsap";
 import { getDeviceTier } from "@/lib/device";
-import { palette, toCssVarObject, type SceneId } from "@/lib/palette";
+import { palette, toCssVarObject, via, type SceneId } from "@/lib/palette";
 import { initScroll, refreshScroll, scrollToScene } from "@/lib/scroll";
 import { SCENES, skyAnchors, type DeviceTier, type SceneMeta, type SceneProps } from "@/lib/scenes";
 import ClockProgress, { type ClockProgressHandle } from "./ClockProgress";
 import Loader from "./Loader";
 import Scene0Intro from "./scenes/Scene0Intro";
-import Scene1Azaan from "./scenes/Scene1Azaan";
+import Scene1Fajr from "./scenes/Scene1Fajr";
+import RisoDefs from "./scenes/tong/RisoDefs";
 
 // Shown while a lazy scene's chunk loads: the slot already reserves its height, so this only
-// needs to avoid an empty frame. Scenes 2-7 fetch nothing until their slot renders (§4.3 rule 10).
+// needs to avoid an empty frame. Scenes 2-8 fetch nothing until their slot renders (§4.3 rule 10).
 function SceneFallback() {
   return (
     <div className="relative h-full" aria-hidden="true">
@@ -49,13 +50,14 @@ function lazyScene(load: () => Promise<{ default: ComponentType<SceneProps> }>) 
 
 const SCENE_COMPONENTS: readonly ComponentType<SceneProps>[] = [
   Scene0Intro,
-  Scene1Azaan,
-  lazyScene(() => import("./scenes/Scene2OldDhaka")),
-  lazyScene(() => import("./scenes/Scene3Rush")),
-  lazyScene(() => import("./scenes/Scene4Noon")),
-  lazyScene(() => import("./scenes/Scene5GoldenHour")),
-  lazyScene(() => import("./scenes/Scene6Neon")),
-  lazyScene(() => import("./scenes/Scene7Midnight")),
+  Scene1Fajr,
+  lazyScene(() => import("./scenes/Scene2Morning")),
+  lazyScene(() => import("./scenes/Scene3Jam")),
+  lazyScene(() => import("./scenes/Scene4Metro")),
+  lazyScene(() => import("./scenes/Scene5Noon")),
+  lazyScene(() => import("./scenes/Scene6Rooftop")),
+  lazyScene(() => import("./scenes/Scene7Adda")),
+  lazyScene(() => import("./scenes/Scene8Closing")),
 ];
 
 const EAGER_SCENES = 2; // scenes 0-1 are static imports and mount immediately
@@ -95,27 +97,26 @@ const noopSubscribe = () => () => {};
 // document load only; add the Scene 0/1 art here when it lands (docs/assets.md).
 const INTRO_ASSETS: string[] = [];
 
-// The sky holds each scene's palette for as long as that scene's text beats are on screen
+// The sky holds each scene's palette for as long as that scene's narration is on screen
 // (lib/scenes.ts skyAnchors), then eases to the next palette while no text is visible. That keeps
-// every text/sky pair at its audited contrast, including across the dark/light inversions.
+// every narration/sky pair at its audited contrast, including across the dark/light inversions.
 
+// Dev-only (absent in production): a 16px tab in the bottom-right corner that opens a flat strip on
+// hover/focus. Collapsed it covers almost nothing, so it never sits over a scene's lower edge.
 function DevJump() {
   return (
     <nav
       aria-label="Scene jump (development only)"
-      className="fixed bottom-3 left-16 z-50 flex flex-wrap gap-1 rounded-full bg-black/80 p-1 font-mono text-[11px] text-white ring-1 ring-white/40"
+      className="group fixed right-0 bottom-0 z-50 flex items-stretch font-mono text-[10px] leading-4 text-white/80 opacity-40 transition-opacity duration-150 hover:opacity-100 focus-within:opacity-100"
     >
-      {SCENES.map((m) => (
-        <button
-          key={m.id}
-          type="button"
-          onClick={() => scrollToScene(m.id, { immediate: true })}
-          className="min-h-8 min-w-8 rounded-full px-2 hover:bg-white/20"
-          title={m.slug}
-        >
-          {m.id}
-        </button>
-      ))}
+      <span aria-hidden="true" className="bg-black/50 px-1 group-hover:hidden group-focus-within:hidden">dev</span>
+      <div className="hidden bg-black/60 group-hover:flex group-focus-within:flex">
+        {SCENES.map((m) => (
+          <button key={m.id} type="button" onClick={() => scrollToScene(m.id, { immediate: true })} className="min-w-5 px-1 hover:bg-white/25 focus-visible:bg-white/25" title={m.slug}>
+            {m.id}
+          </button>
+        ))}
+      </div>
     </nav>
   );
 }
@@ -154,12 +155,12 @@ export default function Experience() {
       for (let n = 0; n < anchors.length - 1; n++) {
         const from = anchors[n].end;
         const to = anchors[n + 1].start;
-        tl.fromTo(
-          root,
-          toCssVarObject(palette[n as SceneId]),
-          { ...toCssVarObject(palette[(n + 1) as SceneId]), duration: to - from, immediateRender: false },
-          from,
-        );
+        const mid = via[n as SceneId];
+        const stops = mid ? [palette[n as SceneId], mid, palette[(n + 1) as SceneId]] : [palette[n as SceneId], palette[(n + 1) as SceneId]];
+        const seg = (to - from) / (stops.length - 1);
+        for (let k = 0; k < stops.length - 1; k++) {
+          tl.fromTo(root, toCssVarObject(stops[k]), { ...toCssVarObject(stops[k + 1]), duration: seg, immediateRender: false }, from + k * seg);
+        }
       }
       tl.set({}, {}, 1); // pad so timeline time === scroll fraction
 
@@ -190,6 +191,12 @@ export default function Experience() {
           );
         })}
       </main>
+      <RisoDefs />
+      <div aria-hidden="true" className="print-marks">
+        <i />
+        <i />
+        <i />
+      </div>
       <ClockProgress ref={clock} />
       {/* Gates scrolling until the real load finishes, then hands off to Scene 0's title reveal. */}
       {!loaded && <Loader assets={INTRO_ASSETS} onComplete={onLoaded} reducedMotion={reducedMotion} />}

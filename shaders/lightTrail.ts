@@ -1,13 +1,17 @@
+// Headlight smears over the wet road (Scene 7). Plain WebGL1, no three.js: one full-screen quad.
+// Colours are the evening's accent (Rickshaw Magenta) and glow (Tong Amber), passed in by LightTrails.
 export const vertexShader = `
+attribute vec2 position;
 varying vec2 vUv;
-void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }
 `;
 
 export const fragmentShader = `
+precision mediump float;
 uniform float uProgress;
 uniform float uVelocity;
-uniform vec3 uCyan;
-uniform vec3 uPink;
+uniform vec3 uA; // evening accent (Rickshaw Magenta)
+uniform vec3 uB; // glow (Tong Amber)
 varying vec2 vUv;
 void main() {
   float speed = abs(uVelocity);
@@ -24,9 +28,10 @@ void main() {
     float halo = exp(-abs(vUv.y - y) * 30.0) * 0.22;
     float trail = smoothstep(-0.015, 0.01, behind) * (1.0 - smoothstep(0.0, length, behind));
     float intensity = (core + halo) * trail;
-    colour += mix(uCyan, uPink, mod(lane, 2.0)) * intensity;
+    colour += mix(uA, uB, mod(lane, 2.0)) * intensity;
     light += intensity;
   }
-  gl_FragColor = vec4(colour, min(light, 0.9));
+  float a = min(light, 0.9);
+  gl_FragColor = vec4(min(colour, vec3(a)), a); // premultiplied
 }
 `;

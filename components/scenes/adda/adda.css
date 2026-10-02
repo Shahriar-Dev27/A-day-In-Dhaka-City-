@@ -1,0 +1,31 @@
+/*
+  Scene 7 (the adda): scene-local tones and the one ambient loop. Every colour is a mix of the shared
+  tokens (sky timeline vars, --cue-* vars from lib/palette.ts, the .stage tones); no hex. Imported by
+  Scene7Adda only. The evening mixes Tong Amber (tungsten) with a white-green tube light and a little
+  Rickshaw Magenta: printed accents, flat fills with halftone halos, never a smooth bloom.
+*/
+.adda {
+  --tube: color-mix(in oklab, var(--cue-cap) 72%, var(--cue-cng));
+  --neon: var(--cue-rickshaw);
+  --tamarind: color-mix(in oklab, var(--glow) 58%, var(--cue-notebook));
+  --tail: color-mix(in oklab, var(--cue-notebook) 92%, var(--glow));
+  --cng: color-mix(in oklab, var(--cue-cng) 70%, var(--ink));
+}
+.a-tube { fill: var(--tube); }
+.a-neon { fill: var(--neon); }
+.a-neon-s { stroke: var(--neon); }
+.a-neon-bg { fill: var(--neon); }
+.a-rick { fill: color-mix(in oklab, var(--cue-rickshaw) 92%, var(--ink)); }
+.a-tamarind { fill: var(--tamarind); }
+.a-tail { fill: var(--tail); }
+.a-cng { fill: var(--cng); }
+.a-strike { stroke: color-mix(in oklab, var(--cue-notebook) 92%, var(--ink)); }
+
+/* mosquitoes: each dot orbits on its own element; GSAP only fades the cloud (data-mosq) */
+.mosq { transform-origin: 0 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .mosq { animation: mosq-orbit 2.4s linear infinite; }
+}
+@keyframes mosq-orbit {
+  to { transform: rotate(360deg); }
+}

@@ -20,7 +20,7 @@ export default function PigeonSwarm({ tier, reducedMotion }: { tier: DeviceTier;
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       context.clearRect(0, 0, w, h);
-      context.fillStyle = palette[5].ink;
+      context.fillStyle = palette[6].ink;
       for (let n = 0; n < count; n++) {
         const a = n * 2.39996 + phase;
         const radius = 0.35 + (n % 9) / 18;

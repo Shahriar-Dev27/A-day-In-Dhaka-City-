@@ -14,7 +14,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
   }, [error]);
 
   return (
-    <html lang="en" className={fontVars} style={toCssVarObject(palette[7]) as CSSProperties}>
+    <html lang="en" className={fontVars} style={toCssVarObject(palette[8]) as CSSProperties}>
       <body>
         <title>Something went wrong · A Day in Dhaka</title>
         <QuietPage bn="কিছু একটা ভুল হয়েছে" en="Something went wrong on our side. Please try again.">

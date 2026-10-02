@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { palette, toCssVarObject } from "@/lib/palette";
 
 /**
- * Shared shell for 404 / error pages: Scene 7's quiet street at night, one lamp, one way back.
+ * Shared shell for 404 / error pages: Scene 8's quiet street at night, one lamp, one way back.
  * Server-safe (no hooks) so error boundaries and global-error can reuse it. Tokens are scoped
  * on the wrapper so it looks the same whatever the sky is doing behind it.
  */
@@ -19,7 +19,7 @@ export default function QuietPage({
 }) {
   return (
     <main
-      style={toCssVarObject(palette[7]) as CSSProperties}
+      style={toCssVarObject(palette[8]) as CSSProperties}
       className="relative isolate flex min-h-svh flex-col items-center justify-center overflow-clip bg-[linear-gradient(to_bottom,var(--sky-top),var(--sky-bottom))] px-(--gutter) pt-16 pb-[calc(22svh+2rem)] text-center text-copy"
     >
       {/* One warm lamp: the same circle of light that opens and closes the day. */}
