@@ -33,6 +33,9 @@ export const palette: Record<SceneId, PaletteTokens> = {
 // warm horizon). Only used between plateaus (no narration is visible there), so it needs no text contrast.
 export const via: Partial<Record<SceneId, PaletteTokens>> = {
   1: { skyTop: "#5F7096", skyBottom: "#E9B58E", ink: "#1D1B22", accent: "#2F5D8C", glow: "#F2A93B", wall: "#787880", tarp: "#2B5382", text: "#2A2630", textMuted: "#4A4650" },
+  // golden hour to evening: a straight lerp from the gold afternoon to night blue passes through grey-brown mud, so
+  // the sky goes via a rose-and-peach sunset (violet top, glowing horizon). Scene 6 runs under this lerp.
+  6: { skyTop: "#9A6A7E", skyBottom: "#F0B27E", ink: "#1C141C", accent: "#D6336C", glow: "#F2A93B", wall: "#6A5F62", tarp: "#274A70", text: "#2A1E24", textMuted: "#4A3C3E" },
 };
 
 // token -> CSS custom property; the only place var names are defined

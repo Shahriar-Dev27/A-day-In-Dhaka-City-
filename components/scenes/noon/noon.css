@@ -1,0 +1,43 @@
+/*
+  Scene 5 (ছায়াটাই এখন দামি): scene-local rules. Every colour is a mix of the shared tokens (the sky timeline's
+  vars, --glow, --accent, the cue hues); no hex. Imported by Scene5Noon only.
+  Ambient loops (the puller's breathing, Mama's tali, the heat shimmer) are transform-only CSS keyframes on
+  their own elements (GSAP owns the parents), paused off-screen by `[data-live="false"] .loop`, and absent
+  under reduced motion (the shimmer is not even rendered then, nor on the low tier).
+*/
+.noon {
+  --straw: color-mix(in oklab, var(--cue-note) 52%, var(--glow));
+  --tea: color-mix(in oklab, var(--accent) 90%, var(--ink));
+  --lemon: color-mix(in oklab, var(--accent) 34%, var(--glow));
+}
+
+.nn-rick { fill: color-mix(in oklab, var(--cue-rickshaw) 84%, var(--ink)); }
+.nn-rick-s { stroke: color-mix(in oklab, var(--cue-rickshaw) 84%, var(--ink)); }
+.nn-straw { fill: var(--straw); }
+.nn-tea { fill: var(--tea); }
+.nn-lemon { fill: var(--lemon); }
+.nn-glass { fill: color-mix(in oklab, var(--glow) 60%, transparent); }
+.nn-heat { stroke: var(--sky-bottom); }
+.nn-fan-blur { fill: var(--ink); }
+
+/* breathing / fanning pivot on the bottom edge of their own boxes */
+.nn-breathe { transform-box: fill-box; transform-origin: 100% 100%; }
+.nn-wave { transform-box: fill-box; transform-origin: 50% 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .nn-breathe { animation: nn-breathe 4.4s ease-in-out infinite alternate; }
+  .nn-wave { animation: nn-wave 1.5s ease-in-out infinite alternate; }
+  .nn-heat-band { animation: nn-heat var(--d, 6s) linear infinite; }
+}
+@keyframes nn-breathe {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(1.035); }
+}
+@keyframes nn-wave {
+  from { transform: rotate(-15deg); }
+  to { transform: rotate(11deg); }
+}
+/* one wavelength per cycle, so the loop is seamless */
+@keyframes nn-heat {
+  to { transform: translateX(var(--wl, 100px)); }
+}

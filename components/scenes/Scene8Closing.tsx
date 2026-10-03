@@ -71,7 +71,7 @@ export default function Scene8Closing({ tier }: SceneProps) {
     const full = mode === "full";
     const $ = (sel: string) => q(sel);
     const E = "power2.out";
-    const [camera, stage] = [$("[data-camera]"), $(".stage")];
+    const [camera, stage, set, skyline] = [$("[data-camera]"), $(".stage"), $("[data-set]"), $("[data-skyline]")];
     const [mamaCount, mamaWrite, mamaShutter, mamaPhone] = ["count", "write", "shutter", "phone"].map((p) => $(`[data-mama="${p}"]`));
     const [coins, tinFill, lid, pages, shutter, lamp, phoneGlow, win, slip] = ["[data-coin]", "[data-tin-fill]", "[data-lid]", "[data-notebook-pages]", "[data-shutter]", "[data-lamp]", "[data-phone-glow]", '[data-window="1"]', "[data-slip]"].map($);
     const [dot, halos, credit, line, again] = ["[data-dot]", "[data-dot-halo]", "[data-credit]", "[data-closing]", "[data-restart]"].map($);
@@ -84,11 +84,11 @@ export default function Scene8Closing({ tier }: SceneProps) {
 
     // ---- one glide toward the tong, then (full motion) the pull-back that ends with the phone centred ---
     if (full) {
-      tl.fromTo(camera, { xPercent: 3, yPercent: 0, x: 0, y: 0, scale: 1 }, { xPercent: 0, scale: 1.14, duration: 0.74, ease }, 0);
+      tl.fromTo(camera, { xPercent: 3, yPercent: 0, x: 0, y: 0, scale: 1 }, { xPercent: -3, scale: 1.14, duration: 0.74, ease }, 0);
       tl.fromTo(
         camera,
-        { x: 0, y: 0, scale: 1.14 },
-        { x: () => phoneToCentre(stage[0], END_SCALE).x, y: () => phoneToCentre(stage[0], END_SCALE).y, scale: END_SCALE, duration: 0.18, ease, immediateRender: false },
+        { xPercent: -3, x: 0, y: 0, scale: 1.14 },
+        { xPercent: 0, x: () => phoneToCentre(stage[0], END_SCALE).x, y: () => phoneToCentre(stage[0], END_SCALE).y, scale: END_SCALE, duration: 0.18, ease, immediateRender: false },
         0.74,
       );
     } else gsap.set(camera, { scale: 1.06 });
@@ -140,7 +140,9 @@ export default function Scene8Closing({ tier }: SceneProps) {
     tl.to(win, { autoAlpha: 0, duration: 0.02, ease: E }, 0.775);
 
     // ---- 0.80-0.94 the world dims; a circle of light shrinks to the 14px dot ---------------------------------
-    tl.to(camera, { opacity: 0.2, duration: 0.1, ease: E }, 0.8);
+    tl.to(set, { autoAlpha: 0, duration: 0.1, ease: E }, 0.8);
+    // reduced motion has no pull-back, so the skyline is still at the set's full size: quiet it behind the type
+    if (!full) tl.to(skyline, { opacity: 0.4, duration: 0.1, ease: E }, 0.8);
     tl.to(dot, { autoAlpha: 1, duration: 0.02, ease: E }, 0.84);
     halos.forEach((h, i) => {
       tl.fromTo(h, { autoAlpha: 0, ...(full && { scale: HALO_FROM[i] }) }, { autoAlpha: 1, duration: 0.02, ease: E, immediateRender: false }, 0.84);
@@ -169,6 +171,8 @@ export default function Scene8Closing({ tier }: SceneProps) {
               </clipPath>
             </defs>
             <SleepingSkyline low={low} />
+            {/* the set: dimmed to almost nothing at the end, so only the skyline, the dot and the type remain */}
+            <g data-set>
             <TongBackdrop state={STATE} />
             <TongWires low={low} />
             <TongStall state={STATE} />
@@ -192,9 +196,10 @@ export default function Scene8Closing({ tier }: SceneProps) {
             </g>
             <TinAndCoins coins={coinCount} />
             <Dog at={[950, 874]} s={0.9} pose="asleep" />
-            <PhoneGlow at={PHONE_AT} low={low} />
+            <PhoneGlow at={PHONE_AT} />
+            </g>
           </Art>
-          <SpeechSlip line={overheard[0]} x={932} y={486} side="left" beat="mama" />
+          <SpeechSlip line={overheard[0]} x={952} y={486} side="left" beat="mama" />
         </Camera>
 
         {/* the loop: the circle of light shrinks onto the dot the site opened on (same centre, same size) */}
@@ -225,12 +230,12 @@ export default function Scene8Closing({ tier }: SceneProps) {
         </div>
 
         {/* below the dot: the closing line, then the way back to the start */}
-        <div className="absolute inset-x-0 top-[calc(50%+3.25rem)] flex flex-col items-center gap-5 px-(--gutter) text-center" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+        <div className="pointer-events-none absolute inset-x-0 top-[calc(50%+3.25rem)] flex flex-col items-center gap-5 px-(--gutter) text-center" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
           <p data-closing>
-            <span lang="bn" className="block font-chunky text-line font-semibold text-balance text-copy">{closing.bn}</span>
+            <span lang="bn" className="closing-line block font-chunky font-semibold text-balance text-copy">{closing.bn}</span>
             <span lang="en" className="mt-1 block font-sans text-sub text-copy-muted">{closing.en}</span>
           </p>
-          <div data-restart>
+          <div data-restart className="pointer-events-auto">
             <button type="button" onClick={() => scrollToScene(0)} className="restart">
               <span lang="bn" className="font-sans text-sub font-semibold">{restart.bn}</span>
               <span lang="en" className="flex items-center gap-2 font-sans text-label uppercase">

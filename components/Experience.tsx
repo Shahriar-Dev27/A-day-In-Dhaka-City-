@@ -93,8 +93,8 @@ function subscribeReduce(cb: () => void) {
 }
 const noopSubscribe = () => () => {};
 
-// The Loader's preload set. Scenes 0-1 are inline SVG today, so honest progress is fonts +
-// document load only; add the Scene 0/1 art here when it lands (docs/assets.md).
+// The Loader's preload set. Scenes 0-1 are inline SVG (no image files), so the honest progress is the
+// load event + fonts (one step per face/subset the intro text uses); add any Scene 0/1 file here (docs/assets.md).
 const INTRO_ASSETS: string[] = [];
 
 // The sky holds each scene's palette for as long as that scene's narration is on screen
@@ -199,7 +199,7 @@ export default function Experience() {
       </div>
       <ClockProgress ref={clock} />
       {/* Gates scrolling until the real load finishes, then hands off to Scene 0's title reveal. */}
-      {!loaded && <Loader assets={INTRO_ASSETS} onComplete={onLoaded} reducedMotion={reducedMotion} />}
+      {!loaded && <Loader assets={INTRO_ASSETS} onComplete={onLoaded} reducedMotion={reducedMotion} tier={tier} />}
       {process.env.NODE_ENV !== "production" && <DevJump />}
     </>
   );

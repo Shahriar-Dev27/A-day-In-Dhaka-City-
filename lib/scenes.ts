@@ -31,7 +31,7 @@ export const SCENES: readonly SceneMeta[] = [
   { id: 3, slug: "jam", clockMinutes: 540, scrollLength: 450, ease: "snappy", triggerStartSvh: 0, narration: { in: 0.82, outEnd: 0.96 } },
   { id: 4, slug: "metro", clockMinutes: 580, scrollLength: 280, ease: "calm", triggerStartSvh: 0, narration: { in: 0.03, outEnd: 0.18 } },
   { id: 5, slug: "noon", clockMinutes: 780, scrollLength: 200, ease: "calm", triggerStartSvh: -70, narration: { in: N.in, outEnd: N.out } },
-  { id: 6, slug: "rooftop", clockMinutes: 990, scrollLength: 200, ease: "snappy", triggerStartSvh: -70, narration: { in: N.in, outEnd: N.out } },
+  { id: 6, slug: "rooftop", clockMinutes: 990, scrollLength: 260, ease: "snappy", triggerStartSvh: -70, narration: { in: N.in, outEnd: N.out } },
   { id: 7, slug: "adda", clockMinutes: 1170, scrollLength: 230, ease: "default", triggerStartSvh: -70, narration: { in: N.in, outEnd: N.out } },
   { id: 8, slug: "closing", clockMinutes: 1425, scrollLength: 220, ease: "calm", triggerStartSvh: -70, narration: { in: N.in, outEnd: N.out } },
 ];

@@ -4,17 +4,24 @@ import { fontVars } from "@/lib/fonts";
 import { cueVars, palette, slipVars, toCssVarObject } from "@/lib/palette";
 import "./globals.css";
 
+const TITLE = "A Day in Dhaka — একটি দিন, ঢাকায়";
+const DESCRIPTION = "A scroll-driven illustrated story that follows one neighbourhood chai stall through an ordinary late-October day in Dhaka, from the 4:45 AM first cup to the midnight phone call.";
+
 export const metadata: Metadata = {
+  // No production domain is set yet; configure NEXT_PUBLIC_SITE_URL so OG image URLs resolve to the real origin.
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000")),
-  title: "A Day in Dhaka",
-  description: "One scroll, one day in Dhaka: from the 4:45 AM azaan to the quiet midnight street.",
-  openGraph: { type: "website", locale: "en_US", alternateLocale: "bn_BD", title: "A Day in Dhaka", description: "One city. One day. A cup of tea." },
-  twitter: { card: "summary_large_image", title: "A Day in Dhaka", description: "One city. One day. A cup of tea." },
+  title: TITLE,
+  description: DESCRIPTION,
+  authors: [{ name: "Shahriar Islam Dip" }],
+  creator: "Shahriar Islam Dip",
+  // Images come from app/opengraph-image.tsx (Next adds og:image and twitter:image automatically).
+  openGraph: { type: "website", locale: "en_US", alternateLocale: "bn_BD", title: TITLE, description: DESCRIPTION },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 export const viewport: Viewport = {
   viewportFit: "cover",
-  themeColor: palette[0].skyTop,
+  themeColor: palette[0].skyTop, // Night Ink ('lib/palette.ts')
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -12,14 +12,14 @@ import { blob, curve, r1, ribbon, wobblePoly, type V2 } from "./geometry";
   prop lands on the inner <g> (the GSAP target), so scenes animate it with x/y/opacity only.
 */
 
-type V = readonly [number, number];
+export type V = readonly [number, number];
 export interface CastProps extends Omit<SVGProps<SVGGElement>, "transform"> {
   at: V2;
   flip?: boolean;
   s?: number;
 }
 
-function Placed({ at, flip, s = 1, children, ...rest }: CastProps & { children: ReactNode }) {
+export function Placed({ at, flip, s = 1, children, ...rest }: CastProps & { children: ReactNode }) {
   return (
     <g transform={`translate(${at[0]} ${at[1]})`}>
       <g {...rest}>
@@ -31,12 +31,12 @@ function Placed({ at, flip, s = 1, children, ...rest }: CastProps & { children: 
 
 // ---- skeleton -------------------------------------------------------------------------------
 
-interface Pose {
+export interface Pose {
   head: V; neck: V; sh: V; ch: V; wa: V; hip: V;
   fk: V; fa: V; ft: V; bk: V; ba: V; bt: V; // front/back knee, ankle, toe
   fe: V; fh: V; be: V; bh: V; // front/back elbow, hand
 }
-interface Build {
+export interface Build {
   H: number;
   head: V; // rx, ry as a fraction of H
   torso: readonly [number, number, number, number]; // widths at sh, ch, wa, hip (fraction of H)
@@ -44,11 +44,11 @@ interface Build {
   arm: readonly [number, number, number]; // upper, fore, hand
 }
 
-const MAN: Build = { H: 320, head: [0.057, 0.067], torso: [0.135, 0.15, 0.135, 0.135], leg: [0.085, 0.065, 0.045], arm: [0.05, 0.042, 0.036] };
+export const MAN: Build = { H: 320, head: [0.057, 0.067], torso: [0.135, 0.15, 0.135, 0.135], leg: [0.085, 0.065, 0.045], arm: [0.05, 0.042, 0.036] };
 const WOMAN: Build = { H: 300, head: [0.058, 0.068], torso: [0.12, 0.125, 0.105, 0.13], leg: [0.08, 0.06, 0.04], arm: [0.046, 0.038, 0.032] };
 const KID: Build = { H: 196, head: [0.09, 0.105], torso: [0.19, 0.21, 0.2, 0.2], leg: [0.11, 0.085, 0.065], arm: [0.07, 0.058, 0.05] };
 
-const STAND: Pose = {
+export const STAND: Pose = {
   head: [0.014, 0.915], neck: [0.006, 0.855], sh: [0.0, 0.81], ch: [-0.004, 0.72], wa: [0.0, 0.6], hip: [0.004, 0.52],
   fk: [0.022, 0.27], fa: [0.014, 0.035], ft: [0.075, 0.012], bk: [-0.012, 0.27], ba: [-0.02, 0.035], bt: [0.04, 0.012],
   fe: [0.03, 0.64], fh: [0.058, 0.49], be: [-0.028, 0.64], bh: [-0.044, 0.49],
@@ -59,11 +59,11 @@ const WALK: Pose = {
   fe: [-0.04, 0.63], fh: [-0.08, 0.5], be: [0.06, 0.64], bh: [0.1, 0.52],
 };
 
-const P = (v: V, H: number): [number, number] => [r1(v[0] * H), r1(-v[1] * H)];
+export const P = (v: V, H: number): [number, number] => [r1(v[0] * H), r1(-v[1] * H)];
 const W = (n: number, H: number) => r1(n * H);
 
 /** The skeleton as separate same-fill paths: back arm, back leg, torso+neck, front leg, head, front arm. */
-function bodyPaths(pose: Pose, b: Build, extra?: { headPath?: string }): string[] {
+export function bodyPaths(pose: Pose, b: Build, extra?: { headPath?: string }): string[] {
   const { H } = b;
   const j = (v: V, w: number) => [...P(v, H), W(w, H)] as const;
   const arm = (sh: V, e: V, h: V) => ribbon([j(sh, b.arm[0]), j(e, b.arm[1]), j(h, b.arm[2])]);
@@ -81,7 +81,7 @@ function bodyPaths(pose: Pose, b: Build, extra?: { headPath?: string }): string[
   ];
 }
 
-function Silhouette({ paths, className = "fill-ink" }: { paths: string[]; className?: string }) {
+export function Silhouette({ paths, className = "fill-ink" }: { paths: string[]; className?: string }) {
   return (
     <g className={className}>
       {paths.map((d, i) => (
@@ -95,15 +95,17 @@ function Silhouette({ paths, className = "fill-ink" }: { paths: string[]; classN
 // Faces right at flip=false. Skull cap, round glasses, small beard, gamchha on the shoulder, checked lungi.
 // Behind the counter only the top ~205 units show; the lungi is drawn for the poses where he steps out.
 
-const MAMA_POSES: Record<"stand" | "pour" | "write" | "count" | "shutter" | "phone", Partial<Pose>> = {
+const MAMA_POSES: Record<"stand" | "pour" | "write" | "count" | "shutter" | "phone" | "fan", Partial<Pose>> = {
   stand: { fe: [0.03, 0.6], fh: [0.12, 0.465], be: [-0.02, 0.62], bh: [0.05, 0.47] },
   pour: { fe: [0.09, 0.66], fh: [0.27, 0.53], be: [-0.02, 0.62], bh: [0.05, 0.47] },
   write: { head: [0.04, 0.9], neck: [0.026, 0.848], fe: [0.05, 0.6], fh: [0.15, 0.455], be: [-0.02, 0.62], bh: [0.07, 0.5] },
+  // front hand up at chest height holding a tali (hand fan) in front of his face (Scene 5)
+  fan: { head: [0.01, 0.915], fe: [0.07, 0.69], fh: [0.14, 0.77], be: [-0.02, 0.62], bh: [0.05, 0.47] },
   count: { fe: [0.05, 0.6], fh: [0.1, 0.5], be: [-0.02, 0.6], bh: [0.08, 0.5] },
   // both arms reach forward and up to a shutter's bottom bar (Scene 8)
   shutter: { head: [0.03, 0.905], neck: [0.018, 0.852], fe: [0.15, 0.79], fh: [0.27, 0.86], be: [0.09, 0.74], bh: [0.2, 0.8] },
   // front hand at the ear, phone in it (Scene 8); the other arm hangs
-  phone: { head: [0.012, 0.915], fe: [0.075, 0.69], fh: [0.008, 0.9], be: [-0.02, 0.62], bh: [0.05, 0.47] },
+  phone: { head: [0.012, 0.915], fe: [0.13, 0.7], fh: [0.008, 0.9], be: [-0.02, 0.62], bh: [0.05, 0.47] },
 };
 export type MamaPose = keyof typeof MAMA_POSES;
 
@@ -143,8 +145,9 @@ export function Mama({ pose = "stand", ...p }: CastProps & { pose?: MamaPose }) 
       {/* the phone at his ear: a dark body, its lit screen a thin strip on the face side (data-phone-screen) */}
       {pose === "phone" ? (
         <g transform={`translate(${mamaHand("phone")[0]} ${mamaHand("phone")[1]}) rotate(-8)`}>
-          <rect x="-4.5" y="-13" width="9" height="22" rx="2.6" className="fill-ink" />
-          <rect data-phone-screen x="2.6" y="-11" width="2.4" height="17" rx="1.2" className="fill-glow" />
+          <rect x="-5" y="-14" width="10" height="24" rx="2.8" className="fill-ink" />
+          <rect x="-5" y="-14" width="10" height="24" rx="2.8" fill="none" strokeWidth="1" style={{ stroke: "var(--cue-cap)" }} opacity="0.55" />
+          <rect data-phone-screen x="3" y="-12" width="2.6" height="19" rx="1.3" className="fill-glow" />
         </g>
       ) : null}
     </Placed>
@@ -221,8 +224,8 @@ export function GarmentWorker({ pose = "walk", ...p }: CastProps & { pose?: "wal
 }
 
 // ---- School kid: uniform shirt, oversized bag -------------------------------------------------
-export function SchoolKid({ pose = "walk", ...p }: CastProps & { pose?: "walk" | "run" }) {
-  const pz: Pose = pose === "run" ? { ...WALK, head: [0.07, 0.9], sh: [0.04, 0.8], ch: [0.03, 0.7], fk: [0.12, 0.34], fa: [0.15, 0.1], ft: [0.2, 0.05], bk: [-0.09, 0.3], ba: [-0.16, 0.17], bt: [-0.1, 0.1] } : { ...WALK, head: [0.03, 0.9], fe: [-0.02, 0.62], fh: [-0.05, 0.48], be: [0.05, 0.62], bh: [0.09, 0.5] };
+export function SchoolKid({ pose = "walk", shirt = "cue-uniform", ...p }: CastProps & { pose?: "walk" | "run" | "reach"; shirt?: string }) {
+  const pz: Pose = pose === "reach" ? { ...STAND, head: [0.06, 0.925], neck: [0.04, 0.86], fe: [0.1, 0.9], fh: [0.15, 1.02], be: [-0.02, 0.66], bh: [0.06, 0.72] } : pose === "run" ? { ...WALK, head: [0.07, 0.9], sh: [0.04, 0.8], ch: [0.03, 0.7], fk: [0.12, 0.34], fa: [0.15, 0.1], ft: [0.2, 0.05], bk: [-0.09, 0.3], ba: [-0.16, 0.17], bt: [-0.1, 0.1] } : { ...WALK, head: [0.03, 0.9], fe: [-0.02, 0.62], fh: [-0.05, 0.48], be: [0.05, 0.62], bh: [0.09, 0.5] };
   const b = KID;
   const H = b.H;
   const [hx, hy] = P(pz.head, H);
@@ -234,7 +237,7 @@ export function SchoolKid({ pose = "walk", ...p }: CastProps & { pose?: "walk" |
       <rect x={shx - 62} y={shy - 6} width="52" height="74" rx="12" className="fill-ink" />
       <rect x={shx - 55} y={shy + 38} width="38" height="24" rx="6" className="fill-wall-lit" opacity="0.8" />
       <Silhouette paths={bodyPaths(pz, b)} />
-      <path className="cue-uniform" d={ribbon([[shx + 2, shy + 4, 38], [wx, (shy + wy) / 2, 42], [wx + 2, wy + 12, 38]])} />
+      <path className={shirt} d={ribbon([[shx + 2, shy + 4, 38], [wx, (shy + wy) / 2, 42], [wx + 2, wy + 12, 38]])} />
       <path className="fill-ink" d={ribbon([[shx - 4, shy + 2, 8], [shx - 12, shy + 26, 7]])} />
       <path d={`M${r1(hx - 18)} ${r1(hy - 14)}Q${r1(hx)} ${r1(hy - 34)} ${r1(hx + 18)} ${r1(hy - 12)}`} className="fill-ink" />
     </Placed>
@@ -351,6 +354,57 @@ export function Vendor({ kind, ...p }: CastProps & { kind: "fuchka" | "jhalmuri"
           <path d={`M${r1(hx - 14)} ${r1(hy - 14)}Q${r1(hx)} ${r1(hy - 30)} ${r1(hx + 16)} ${r1(hy - 12)}`} className="fill-ink" />
         </g>
       )}
+    </Placed>
+  );
+}
+
+// ---- Kite boy (Scene 6): barefoot, a checked lungi folded up to the knee (the one cue) -----------------
+const KITE_POSES: Record<"reach" | "run", Partial<Pose>> = {
+  reach: { head: [0.07, 0.925], neck: [0.045, 0.86], sh: [0.03, 0.8], ch: [0.025, 0.7], fe: [0.1, 0.9], fh: [0.17, 1.02], be: [-0.03, 0.66], bh: [0.06, 0.72] },
+  run: { head: [0.075, 0.915], neck: [0.05, 0.855], sh: [0.04, 0.8], ch: [0.03, 0.7], fk: [0.12, 0.34], fa: [0.15, 0.1], ft: [0.2, 0.05], bk: [-0.09, 0.3], ba: [-0.16, 0.17], bt: [-0.1, 0.1], fe: [0.12, 0.88], fh: [0.18, 1.0], be: [-0.06, 0.66], bh: [-0.12, 0.56] },
+};
+
+/** Where the front hand holds the string: px relative to the feet, facing right (negate x when flipped). */
+export function kiteBoyHand(pose: "reach" | "run"): V2 {
+  return P({ ...STAND, ...KITE_POSES[pose] }.fh, KID.H);
+}
+
+export function KiteBoy({ pose = "run", ...p }: CastProps & { pose?: "reach" | "run" }) {
+  const pz: Pose = { ...(pose === "run" ? WALK : STAND), ...KITE_POSES[pose] };
+  const b = KID;
+  const H = b.H;
+  const [hx, hy] = P(pz.head, H);
+  const mid = (a: V, c: V): V => [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2];
+  const thigh = mid(pz.hip, mid(pz.fk, pz.bk));
+  const knee = mid(pz.fk, pz.bk);
+  const [bx, by] = P(pz.bh, H);
+  return (
+    <Placed {...p}>
+      <Silhouette paths={bodyPaths(pz, b)} />
+      <path d={ribbon([[...P(pz.hip, H), 46], [...P(thigh, H), 56], [...P(knee, H), 50]])} fill="url(#lungi-check)" />
+      <path d={`M${r1(hx - 14)} ${r1(hy - 12)}Q${r1(hx)} ${r1(hy - 32)} ${r1(hx + 16)} ${r1(hy - 10)}`} className="fill-ink" />
+      {pose === "reach" ? <circle cx={bx + 4} cy={by + 2} r="8" className="fill-wood" /> : null}
+    </Placed>
+  );
+}
+
+// ---- Mother at the clothesline (Scene 6): both arms up, a sari wrapped and draped (the cue colour) ---------
+export function Mother({ cue = "cue-green", ...p }: CastProps & { cue?: string }) {
+  // one arm up to pin a cloth on the line, the other holding a wet bundle at her side
+  const pz: Pose = { ...STAND, head: [0.016, 0.915], fe: [0.07, 0.9], fh: [0.085, 1.02], be: [-0.03, 0.6], bh: [-0.06, 0.4] };
+  const b = WOMAN;
+  const H = b.H;
+  const [hx, hy] = P(pz.head, H);
+  const [shx, shy] = P(pz.sh, H);
+  const [cx, cy] = P(pz.ch, H);
+  const [bx, by] = P(pz.bh, H);
+  return (
+    <Placed {...p}>
+      <Silhouette paths={bodyPaths(pz, b)} />
+      <path className="cue-cap" d={blob([[bx - 14, by - 4], [bx + 2, by - 10], [bx + 16, by - 2], [bx + 14, by + 26], [bx + 2, by + 34], [bx - 12, by + 24]])} />
+      <circle cx={hx - 17} cy={hy - 3} r="11" className="fill-ink" />
+      <path className={cue} d={ribbon([[...P(pz.hip, H), 52], [...P([0.012, 0.32], H), 66], [...P([0.0, 0.05], H), 64]])} />
+      <path className={cue} d={ribbon([[shx + 2, shy + 4, 18], [cx + 6, cy + 22, 30], [cx - 6, cy + 70, 34]])} />
     </Placed>
   );
 }

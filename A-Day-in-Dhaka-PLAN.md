@@ -4,6 +4,9 @@
 
 **How to use this file with Claude Code:** Put this file in the project root. Work one phase at a time. Do not start a phase until the previous phase's checkpoint passes. Tick the checkboxes as tasks finish. Ask me before changing scope, the stack, or the scene list.
 
+> **v2 amendments (2026-10).** The site is now nine scenes, not eight: Metro Rail was added by the user's decision. The tea-cup thread was replaced by one chai stall (Mama's Tong) followed through the day. Current plan and interface contract: `.devteam/dhaka-v2-tong/01-plan.md`. Sections below describe v1 where they differ.
+
+
 ---
 
 ## 1. Project summary

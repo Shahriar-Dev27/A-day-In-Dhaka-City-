@@ -1,18 +1,17 @@
 # Asset & licence log
 
-Every shipped asset needs a row (AC-C2). Fonts are self-hosted at build time by `next/font/google` (no runtime request to Google).
+Every shipped asset needs a row. There are no raster images and no audio files: all illustration is original inline SVG authored in code, and grain, halftone and paper specks are generated patterns. Fonts are self-hosted at build time by `next/font/google` (no runtime request to Google).
 
-| Name | Source | Licence | URL | Scene / use |
-|---|---|---|---|---|
-| Noto Serif Bengali (variable; bengali + latin subsets) | Google Fonts via `next/font/google` (`lib/fonts.ts`) | SIL Open Font License 1.1 | https://fonts.google.com/noto/specimen/Noto+Serif+Bengali | Narration line, S0 title, clock-ticket daypart word |
-| Hind Siliguri 400/500/600 (bengali + latin) | Google Fonts via `next/font/google` (`lib/fonts.ts`) | SIL Open Font License 1.1 | https://fonts.google.com/specimen/Hind+Siliguri | English subtitles, clock-ticket time, uppercase labels |
-| Baloo Da 2 (variable; bengali + latin) | Google Fonts via `next/font/google` (`lib/fonts.ts`) | SIL Open Font License 1.1 | https://fonts.google.com/specimen/Baloo+Da+2 | Overheard speech slips, Scene 3 giant words, closing word |
-| Page grain (inline SVG feTurbulence as a CSS background data-URI, rasterised once; no runtime filter) | Original, `app/globals.css` `body::after` | Project-owned | n/a | All scenes (static overlay) |
-| Riso patterns: halftone dots (3 densities), paper specks, wood planks, lungi and gamchha checks (static SVG `<pattern>`s) | Original, `components/scenes/tong/RisoDefs.tsx` | Project-owned | n/a | Every tong scene; no image file shipped |
-| The tong set: awning, booth, counter, kettle and burner, shutter, six-storey block, wires, minarets, signboards (inline SVG) | Original, `components/scenes/tong/TongSet.tsx` + `geometry.ts` (hand-lettered signs are abstract glyph shapes, not real words or brands) | Project-owned | n/a | Scenes 1, 2 (and 5, 7, 8 later) |
-| Cast silhouettes: Mama, night guard, garment worker, school kid, newspaper hawker, dog (inline SVG built from tapered ribbons) | Original, `components/scenes/tong/cast.tsx` | Project-owned | n/a | Scenes 1, 2 |
-| Direction-responsive pigeon flock (Canvas2D) | Original, `components/scenes/PigeonSwarm.tsx` | Project-owned | n/a | Scene 5; 28 low-tier / 64 high-tier birds; static under reduced motion |
-| Scroll/velocity light-trail shader (GLSL) | Original, `shaders/lightTrail.ts` and `components/scenes/LightTrails.tsx` | Project-owned | n/a | Scene 7 (headlights on the wet road); plain WebGL1, no three.js; high-tier/full-motion only; SVG streaks on the low tier and in reduced motion |
-| Social preview, chai-glass app icon and Apple icon | Original, `app/opengraph-image.tsx`, `app/icon.svg`, `app/apple-icon.tsx` | Project-owned | n/a | 1200×630 social image; 180×180 Apple icon; no external image source |
-| README walkthrough (`docs/media/a-day-in-dhaka.mp4`) | User-supplied `a day in Dhaka.mp4`; original recording preserved | User-provided; no separate licence supplied | [Video](./media/a-day-in-dhaka.mp4) | README; 20.5-second, 1920×1080 H.264/AAC recording |
-| Animated README preview (`docs/media/a-day-in-dhaka-preview.gif`) | Derived from the user-supplied walkthrough using FFmpeg | Same source as the walkthrough | [Preview](./media/a-day-in-dhaka-preview.gif) | README; 640×360, 6 fps preview linking to the original MP4 |
+| Name | Source | Licence | Scene / use |
+|---|---|---|---|
+| Noto Serif Bengali (variable; bengali + latin) | Google Fonts via `next/font/google` (`lib/fonts.ts`); https://fonts.google.com/noto/specimen/Noto+Serif+Bengali | SIL Open Font License 1.1 | Display voice: Bangla narration, titles, clock-ticket daypart word |
+| Hind Siliguri 400/500/600 (bengali + latin) | Google Fonts via `next/font/google`; https://fonts.google.com/specimen/Hind+Siliguri | SIL Open Font License 1.1 | English subtitles, clock time, uppercase labels |
+| Baloo Da 2 (variable; bengali + latin) | Google Fonts via `next/font/google`; https://fonts.google.com/specimen/Baloo+Da+2 | SIL Open Font License 1.1 | Overheard speech slips, jam-scene giant words, closing word |
+| Noto Serif Bengali 700, Latin subset (TTF) | Fetched from Google Fonts at build time by `app/opengraph-image.tsx` (satori cannot read woff2) | SIL Open Font License 1.1 | Social card text only; not shipped to the browser |
+| Page grain, halftone dots, paper specks, wood planks, lungi/gamchha checks | Generated: SVG `feTurbulence` and SVG `<pattern>`s in `app/globals.css` and `components/scenes/tong/RisoDefs.tsx` | Project-owned | All scenes; no image files |
+| Illustration: tong set, cast, jam street and vehicles, Metro exterior/interior, adda, rooftop, closing, intro | Original inline SVG in `components/scenes/**` (hand-lettered signs are abstract glyph shapes, not real words or brands) | Project-owned | Scenes 0 to 8 |
+| Pigeon flock | Original Canvas 2D, `components/scenes/PigeonSwarm.tsx` | Project-owned | Scene 6; fewer birds on the low tier, static under reduced motion |
+| Light-trail shader | Original GLSL (`shaders/lightTrail.ts`) and `components/scenes/LightTrails.tsx`; plain WebGL, no three.js | Project-owned | Evening scene on the high tier; SVG streaks on the low tier and under reduced motion |
+| Social card (1200×630), tab icon, Apple icon | Generated by code: `app/opengraph-image.tsx`, `app/icon.svg`, `app/apple-icon.tsx` | Project-owned | Metadata; the bulb mark and halftone halo are drawn in code |
+
+Not yet replaced: `app/favicon.ico` (pre-v2 file, source not recorded).

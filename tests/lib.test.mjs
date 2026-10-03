@@ -5,9 +5,9 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SCENES, SCENE_OFFSETS, SCROLL_RANGE_SVH, TOTAL_SVH, progressToClockMinutes, skyAnchors, textWindowSvh } from "../lib/scenes.ts";
+import { LIGHT_DOT, SCENES, SCENE_OFFSETS, SCROLL_RANGE_SVH, TOTAL_SVH, lightDotStyle, progressToClockMinutes, skyAnchors, textWindowSvh } from "../lib/scenes.ts";
 import { CLOCK, CUE, METRO, SLIP, cssVars, cueVars, metroVars, palette, toCssVarObject, via } from "../lib/palette.ts";
-import { COPY, DAYPART } from "../lib/copy.ts";
+import { COPY, CREDIT_LINKS, CREDIT_NAME, DAYPART } from "../lib/copy.ts";
 import { GROUND_Y, SAFE_COLUMN, STROKE, TONG_ORIGIN, blob, ribbon, rng, wobbleRect } from "../components/scenes/tong/geometry.ts";
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -21,11 +21,11 @@ const LAST = SCENES.length - 1;
 
 test("scene registry: offsets and ranges are consistent", () => {
   assert.deepEqual(SCENES.map((s) => s.id), [0, 1, 2, 3, 4, 5, 6, 7, 8]);
-  assert.deepEqual(SCENES.map((s) => s.scrollLength), [100, 200, 200, 450, 280, 200, 200, 230, 220]);
+  assert.deepEqual(SCENES.map((s) => s.scrollLength), [100, 200, 200, 450, 280, 200, 260, 230, 220]);
   assert.deepEqual(SCENES.map((s) => s.clockMinutes), [null, 285, 420, 540, 580, 780, 990, 1170, 1425]);
-  assert.deepEqual([...SCENE_OFFSETS], [0, 100, 300, 500, 950, 1230, 1430, 1630, 1860]);
-  assert.equal(TOTAL_SVH, 2080);
-  assert.equal(SCROLL_RANGE_SVH, 1980);
+  assert.deepEqual([...SCENE_OFFSETS], [0, 100, 300, 500, 950, 1230, 1430, 1690, 1920]);
+  assert.equal(TOTAL_SVH, 2140);
+  assert.equal(SCROLL_RANGE_SVH, 2040);
   assert.deepEqual(SCENES.map((s) => s.triggerStartSvh), [0, -70, -70, 0, 0, -70, -70, -70, -70]);
   for (const s of SCENES) assert.ok(s.narration.in >= 0 && s.narration.in < s.narration.outEnd && s.narration.outEnd <= 1, `scene ${s.id} narration window`);
 });
@@ -56,7 +56,7 @@ test("progressToClockMinutes: monotonic and continuous (no jump at slot boundari
   for (let i = 1; i <= 1000; i++) {
     const m = progressToClockMinutes(i / 1000);
     assert.ok(m >= prev, `decreased at ${i / 1000}`);
-    // Steepest segment: 255 minutes over 230svh (S7 -> S8) = 1.11 min/svh, sampled every 1.98svh = 2.2.
+    // Steepest segment: 255 minutes over 230svh (S7 -> S8) = 1.11 min/svh, sampled every 2.04svh = 2.27.
     assert.ok(m - prev <= 2.6, `jump of ${m - prev} min at ${i / 1000}`);
     prev = m;
   }
@@ -236,4 +236,101 @@ test("tong geometry: CSS --tong-origin matches TONG_ORIGIN, safe column fits a 3
 test("clock ticket: DAYPART word per scene start, 12-hour label format", () => {
   const word = (m) => [...DAYPART].reverse().find((d) => m >= d.from).bn;
   assert.deepEqual([285, 420, 540, 580, 780, 990, 1170, 1425].map(word), ["ভোর", "সকাল", "সকাল", "সকাল", "দুপুর", "বিকেল", "সন্ধ্যা", "রাত"]);
+});
+
+test("the loop dot: one set of constants places it in Scene 0 and Scene 8 (centre of the stage, 14px, margins not transform)", () => {
+  assert.deepEqual(LIGHT_DOT, { sizePx: 14, colorToken: "glow", centerX: 0.5, centerY: 0.5 });
+  assert.equal(lightDotStyle.left, "50%");
+  assert.equal(lightDotStyle.top, "50%");
+  assert.equal(lightDotStyle.width, 14);
+  assert.equal(lightDotStyle.height, 14);
+  assert.equal(lightDotStyle.marginLeft, -7); // centred by margin so GSAP owns the element's transform
+  assert.equal(lightDotStyle.marginTop, -7);
+  assert.ok(!("transform" in lightDotStyle));
+  assert.equal(SCENES[7].scrollLength, 230); // the adda's strike needs the pinned hold (M3 request)
+  assert.equal(SCENES[6].scrollLength, 260); // the rooftop: kites, the cut, the descent and a lane chase need the pinned hold
+});
+
+test("credit: name only until URLs are supplied; any link is https and rendered with rel=noopener noreferrer", () => {
+  assert.equal(COPY[8].extra.credit.en, `Designed and built by ${CREDIT_NAME}`);
+  assert.ok(Array.isArray(CREDIT_LINKS));
+  for (const l of CREDIT_LINKS) {
+    assert.ok(l.label.trim().length > 0, "link label");
+    assert.match(l.href, /^https:\/\/\S+$/, `link ${l.label} must be https`);
+  }
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const src = readFileSync(join(root, "components/scenes/Scene8Closing.tsx"), "utf8");
+  assert.match(src, /rel="noopener noreferrer"/);
+  assert.match(src, /scrollToScene\(0\)/); // the restart button
+  assert.match(src, /<button type="button"/);
+});
+
+test("rooftop: pigeon cap <= 40 low / <= 120 high, 2D canvas only, copy from lib/copy.ts, sunset keyframe after Scene 6", () => {
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const swarm = readFileSync(join(root, "components/scenes/PigeonSwarm.tsx"), "utf8");
+  const cap = swarm.match(/SWARM_CAP = \{ low: (\d+), high: (\d+) \}/);
+  assert.ok(cap && Number(cap[1]) <= 40 && Number(cap[2]) <= 120, "SWARM_CAP");
+  assert.match(swarm, /getContext\("2d"\)/);
+  assert.match(swarm, /Math\.sign\(v\)/);
+  assert.match(swarm, /cancelAnimationFrame/);
+  assert.match(swarm, /Math\.min\(window\.devicePixelRatio \|\| 1, 2\)/);
+  assert.doesNotMatch(swarm, /webgl/i);
+  const scene = readFileSync(join(root, "components/scenes/Scene6Rooftop.tsx"), "utf8");
+  assert.doesNotMatch(scene.replace(/\/\*[\s\S]*?\*\//g, ""), /ভো/, "the cry comes from lib/copy.ts");
+  assert.ok(via[6], "via[6]");
+  assert.notEqual(via[6].skyBottom, palette[6].skyBottom);
+});
+
+test("intro: the bulb's core is the loop dot (lightDotStyle) in both the veil and Scene 0; title/prompt come from lib/copy.ts; heat is monotonic", async () => {
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const art = readFileSync(join(root, "components/scenes/intro/art.tsx"), "utf8");
+  assert.match(art, /\.\.\.lightDotStyle/); // the one dot, shared by Loader's veil and Scene 0
+  const scene = readFileSync(join(root, "components/scenes/Scene0Intro.tsx"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.match(scene, /COPY\[0\]\.extra/);
+  assert.doesNotMatch(scene, /একটি|ঢাকায়|নিচে স্ক্রল/, "Scene 0 copy must come from lib/copy.ts");
+  assert.equal(COPY[0].extra.title.bn, "একটি দিন, ঢাকায়");
+  assert.equal(COPY[0].extra.title.en, "A Day in Dhaka");
+  assert.equal(COPY[0].extra.prompt.en, "Scroll to begin");
+  const loader = readFileSync(join(root, "components/Loader.tsx"), "utf8");
+  assert.match(loader, /MAX_MS = 6000/); // the hard cap
+  assert.match(loader, /s\.then\(step, step\)/); // an error counts as loaded
+  assert.match(loader, /document\.fonts\.load/); // real progress from the faces the title uses
+  assert.doesNotMatch(loader, /Math\.random/); // nothing faked
+  // heat: dim/orange -> full/gold, each channel monotonic, rest (1) = the full state, halo grows
+  const src = art.match(/export function heatState[\s\S]*?\n}\n/)[0].replace("export function heatState(h: number)", "(h)").replace(/\/\/.*\n/g, "");
+  const heatState = eval(`(${src.replace(/^\(h\) \{/, "(h) => {")})`);
+  let prev = heatState(0);
+  assert.equal(heatState(1).halo, 1);
+  assert.equal(heatState(1).dot, 1);
+  for (let h = 0.1; h <= 1.0001; h += 0.1) {
+    const s = heatState(h);
+    for (const k of ["halo", "haloAlpha", "gold", "glassGold", "dot"]) assert.ok(s[k] >= prev[k], `${k} monotonic at ${h}`);
+    prev = s;
+  }
+});
+
+test("noon: copy from lib/copy.ts on a SlipAnchor slip, heat shimmer off on low tier and reduced motion, no filters, ambient loops reduce-gated, drops end inside the timeline", () => {
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const scene = strip(readFileSync(join(root, "components/scenes/Scene5Noon.tsx"), "utf8"));
+  assert.doesNotMatch(scene, /কারেন্ট|রোদ যত/, "Scene 5 copy must come from lib/copy.ts");
+  assert.equal(COPY[5].overheard.length, 1);
+  assert.equal(COPY[5].overheard[0].bn, "আবার কারেন্ট গেল!");
+  assert.match(scene, /<SlipAnchor /);
+  assert.match(scene, /!low && !reducedMotion \? <HeatShimmer/); // low tier and reduced motion: not even rendered
+  const art = strip(readFileSync(join(root, "components/scenes/noon/art.tsx"), "utf8"));
+  const css = readFileSync(join(root, "components/scenes/noon/noon.css"), "utf8");
+  assert.match(art, /BANDS = \[/);
+  assert.equal((art.match(/\[\d+, \d+, [\d.]+, \d, [\d.]+, [\d.]+\]/g) ?? []).length, 4, "3-4 shimmer bands");
+  for (const src of [art, css]) assert.doesNotMatch(src, /<filter|feTurbulence|feDisplacementMap|feGaussianBlur|backdrop-filter|mix-blend-mode|filter:/);
+  // every ambient animation sits inside the no-preference media query
+  const anim = css.split("@media (prefers-reduced-motion: no-preference) {")[1].split("}\n@keyframes")[0];
+  for (const n of ["nn-breathe", "nn-wave", "nn-heat"]) assert.match(anim, new RegExp(`animation: ${n}`));
+  assert.equal((css.match(/animation:/g) ?? []).length, 3);
+  // the timeline is padded to 1 by the kit, but a tween ending past 1 would rescale every beat: the last drop must end < 1
+  const [, base, step, dur] = scene.match(/const from = ([\d.]+) \+ i \* ([\d.]+);[\s\S]*?y: 28, duration: ([\d.]+)/);
+  assert.ok(Number(base) + 2 * Number(step) + Number(dur) < 1);
+  // the light warms toward Scene 6's gold: glow brightest at noon, ink/wall pinned from palette[5]
+  assert.match(scene, /palette\[5\]/);
+  assert.match(scene, /palette\[6\]/);
 });

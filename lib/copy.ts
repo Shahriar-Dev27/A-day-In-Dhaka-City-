@@ -85,7 +85,7 @@ export const COPY: Record<SceneId, SceneCopy> = {
   },
   6: {
     narration: { bn: "ছাদ আমাদের উঠান", en: "The rooftop is our courtyard." },
-    overheard: [{ who: "kiteBoy", bn: "ভো-কাট্টা!", en: "Vo-kaatta!" }],
+    overheard: [{ who: "kid", bn: "ভো-কাট্টা!", en: "Vo-kaatta!" }],
   },
   7: {
     narration: { bn: "বাড়ি ফেরার আগে, একটু আড্ডা", en: "A little adda before home." },

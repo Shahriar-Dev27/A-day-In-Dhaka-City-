@@ -1,0 +1,56 @@
+/*
+  Scene 6 (ছাদ আমাদের উঠান): scene-local rules. Every colour is a mix of the shared tokens (sky timeline
+  vars, --glow, --accent); no hex. Imported by Scene6Rooftop only.
+  The ambient loops (haze drift, washing sway, kite tails, far-kite bob) are transform-only CSS keyframes on
+  their own elements (GSAP owns the parents), paused off-screen by `[data-live="false"] .loop`, and absent
+  under reduced motion.
+*/
+.rooftop {
+  /* a low hazy sun: the glow pulled a little toward the accent so it stands off the gold sky */
+  --sun: color-mix(in oklab, var(--glow) 84%, var(--accent));
+  --haze: color-mix(in oklab, var(--sky-bottom) 80%, var(--glow));
+}
+.rf-sun { fill: var(--sun); }
+.rf-sun-halo { fill: color-mix(in oklab, var(--glow) 38%, var(--sky-bottom)); }
+.rf-haze { fill: var(--haze); }
+
+.rf-sway,
+.rf-tail,
+.rf-bob-a,
+.rf-bob-b { transform-box: fill-box; transform-origin: 50% 0; }
+.rf-bob-a,
+.rf-bob-b { transform-origin: 50% 50%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rf-drift-a { animation: rf-drift 52s ease-in-out infinite alternate; }
+  .rf-drift-b { animation: rf-drift 70s ease-in-out infinite alternate-reverse; }
+  .rf-sway { animation: rf-sway 3.8s ease-in-out infinite alternate; }
+  .rf-tail { animation: rf-tail 1.7s ease-in-out infinite alternate; }
+  .rf-bob-a { animation: rf-bob 6.2s ease-in-out infinite alternate; }
+  .rf-bob-b { animation: rf-bob 8.4s ease-in-out infinite alternate-reverse; }
+}
+@keyframes rf-drift {
+  from { transform: translateX(-90px); }
+  to { transform: translateX(90px); }
+}
+@keyframes rf-sway {
+  from { transform: rotate(-2.4deg); }
+  to { transform: rotate(2.6deg); }
+}
+@keyframes rf-tail {
+  from { transform: skewX(-9deg); }
+  to { transform: skewX(9deg); }
+}
+@keyframes rf-bob {
+  from { transform: translateY(-6px) rotate(-5deg); }
+  to { transform: translateY(5px) rotate(6deg); }
+}
+
+/*
+  The lit set. The wall is pinned to the afternoon's value on the root (see Scene6Rooftop), and the sunlit and
+  shaded planes are mixes of it: the low sun warms every lit face, the shade leans toward the ink.
+*/
+.rooftop .stage {
+  --wall-lit: color-mix(in oklab, var(--wall) 76%, var(--glow));
+  --wall-dark: color-mix(in oklab, var(--wall) 72%, var(--ink));
+}

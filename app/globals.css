@@ -67,6 +67,7 @@
 .cue-lanyard { fill: color-mix(in oklab, var(--cue-lanyard) 80%, var(--ink)); }
 .cue-lanyard-s { stroke: color-mix(in oklab, var(--cue-lanyard) 80%, var(--ink)); }
 .cue-note { fill: color-mix(in oklab, var(--cue-note) 85%, var(--ink)); }
+.cue-green { fill: color-mix(in oklab, var(--cue-cng) 80%, var(--ink)); }
 .banana { fill: color-mix(in oklab, var(--glow) 82%, var(--ink)); }
 
 /*

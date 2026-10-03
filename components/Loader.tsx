@@ -2,31 +2,38 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
+import type { DeviceTier } from "@/lib/scenes";
 import { refreshScroll, startScroll, stopScroll } from "@/lib/scroll";
+import { IntroBulb, heatState } from "./scenes/intro/art";
+import "./scenes/intro/intro.css";
 
 /*
-  The opening beat: a dark sky, one circle of light that grows with real load progress, then
-  expands past the edges of the screen and hands off to Scene 0's title reveal (SCRIPT, Scene 0).
+  The opening beat (SCRIPT-v2, Scene 0): one bare bulb on a wire in the dark. A veil (same sky as the
+  page) carries the bulb; it warms from orange to gold and its halo grows with REAL load progress, swells
+  at 100%, settles onto the 14px dot at the stage centre, and the veil cross-fades onto Scene 0's own
+  (pixel-identical) rest bulb while the title rises out of the light.
 
   Honesty rules this file follows:
-  - Progress is the fraction of real steps finished (fonts, document load, `assets`). Nothing is faked.
+  - Progress is the fraction of real steps finished: the load event, document.fonts.ready, and one
+    document.fonts.load per distinct face/size the intro text actually uses (so the subsets the title
+    needs, not a guess), plus `assets`. Nothing is faked; the warm-up is only smoothed over 0.9 s.
   - The veil always leaves. Every step resolves on error, MAX_MS caps a stalled asset, and that timer
-    plus the exit path live outside the GSAP context, so even a broken animation cannot trap the page
-    behind a locked scroll.
-  - The veil is in the server HTML, so the hero never flashes before it mounts; <noscript> removes it,
-    and the title is only ever hidden by JS, so with JS off the page reads as plain content.
+    plus the exit path live outside the animation, so even a broken animation cannot trap the page behind
+    a locked scroll. Scroll unlocks as soon as the bulb has settled, not at the end of the title reveal.
+  - The veil is in the server HTML (the bulb is in the first paint, at 0% heat), so the hero never flashes
+    before it mounts; <noscript> removes it, and the title is only ever hidden by JS.
 */
 
-const MIN_MS = 600; // floor, so a warm cache still reads as a deliberate opening rather than a flicker
+const MIN_MS = 500; // floor from hydration, so a warm cache still reads as a bulb warming up rather than a flicker
 const MAX_MS = 6000; // ceiling, so a stalled font or image can never hold the page
-const DOT_VMIN = 18; // must match the dot's w-[18vmin] below (used to compute the cover scale)
+const SWING_DEG = 0.7; // "a hair": ~6px at the bulb
 
 /** Resolves once `url` is in cache. Errors resolve too: a missing asset must not hold the veil. */
 function preloadImage(url: string) {
   return new Promise<void>((resolve) => {
     const img = new Image();
     img.onload = img.onerror = () => resolve();
-    img.src = url; // Scene 0/1 art is SVG/WebP; audio is not part of the intro set
+    img.src = url;
   });
 }
 
@@ -35,20 +42,24 @@ function documentLoaded() {
   return new Promise<void>((resolve) => window.addEventListener("load", () => resolve(), { once: true }));
 }
 
-/** Scale at which the centred dot covers the viewport corner to corner. */
-function coverScale() {
-  const { innerWidth: w, innerHeight: h } = window;
-  return Math.hypot(w, h) / ((DOT_VMIN / 100) * Math.min(w, h));
+/** Load the exact face (family, weight, size) and glyph subset an intro text element renders with. */
+function loadFaceFor(el: HTMLElement) {
+  const cs = getComputedStyle(el);
+  const raw = el.textContent ?? "";
+  const text = cs.textTransform === "uppercase" ? raw.toUpperCase() : raw;
+  return document.fonts.load(`${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, text);
 }
 
 export default function Loader({
   assets,
   onComplete,
   reducedMotion,
+  tier,
 }: {
   assets: string[];
   onComplete: () => void;
   reducedMotion: boolean;
+  tier: DeviceTier;
 }) {
   const root = useRef<HTMLDivElement>(null);
 
@@ -72,65 +83,110 @@ export default function Loader({
     let disposed = false;
     let floorTimer = 0;
 
-    /** The only exit. Unlocks the page and lets Experience unmount this veil. */
+    const unlock = () => {
+      startScroll();
+      refreshScroll(); // fonts and art settled while the veil was up
+      performance.mark("dhaka:first-scene-ready");
+    };
+    /** The only exit until the animation is set up. Unlocks the page and lets Experience unmount this veil. */
     const finish = () => {
       if (done) return;
       done = true;
-      startScroll();
-      refreshScroll(); // fonts and art settled while the veil was up
+      unlock();
       onComplete();
     };
     // Reassigned to the choreographed version once (and only if) the animation is set up.
     let exit = finish;
 
-    const steps: Promise<unknown>[] = [document.fonts.ready, documentLoaded(), ...assets.map(preloadImage)];
+    // Distinct faces the intro text uses (title/prompt, Bangla and English).
+    const probes = Array.from(document.querySelectorAll<HTMLElement>("[data-font-probe]"));
+    const steps: Promise<unknown>[] = [documentLoaded(), document.fonts.ready, ...probes.map(loadFaceFor), ...assets.map(preloadImage)];
 
     const ctx = gsap.context(() => {
-      const dot = el.querySelector<HTMLElement>("[data-loader-dot]");
-      if (!dot) return;
       // Queried off the document, not the context scope: these live in Scene 0, outside this root.
-      const words = Array.from(document.querySelectorAll<HTMLElement>("[data-intro-reveal] .split-word"));
+      const words = Array.from(document.querySelectorAll<HTMLElement>("[data-intro-reveal] .split-word:not([data-letter])"));
+      const letters = Array.from(document.querySelectorAll<HTMLElement>("[data-intro-reveal] [data-letter]"));
+      const rules = Array.from(document.querySelectorAll<HTMLElement>("[data-intro-reveal] [data-rule]"));
       const prompt = Array.from(document.querySelectorAll<HTMLElement>("[data-intro-fade]"));
+      const one = (s: string) => el.querySelector<HTMLElement | SVGElement>(s);
+      const swing = one("[data-swing]");
+      const swell = one("[data-swell]");
+      const halo = one("[data-halo]");
+      const gold = one("[data-gold]");
+      const glassBase = one("[data-glass-base]");
+      const glassGold = one("[data-glass-gold]");
+      const hot = one("[data-hot]");
+      const dot = one("[data-dot]");
+      if (!swing || !swell || !halo || !gold || !glassBase || !glassGold || !hot || !dot) return;
       // Hidden here rather than in CSS so the title still renders without JS. ctx.revert() restores it.
       gsap.set(words, { yPercent: 110, autoAlpha: 0 });
+      gsap.set(letters, { yPercent: 110, autoAlpha: 0 });
+      gsap.set(rules, { scaleX: 0, transformOrigin: "50% 50%" });
       gsap.set(prompt, { autoAlpha: 0, y: 16 });
 
-      const growX = gsap.quickTo(dot, "scaleX", { duration: 0.5, ease: "power2.out" });
-      const growY = gsap.quickTo(dot, "scaleY", { duration: 0.5, ease: "power2.out" });
-      const brighten = gsap.quickTo(dot, "opacity", { duration: 0.5, ease: "power2.out" });
+      // The bulb hangs and sways a hair until it is switched fully on.
+      const sway = gsap.fromTo(swing, { rotation: -SWING_DEG }, { rotation: SWING_DEG, duration: 2.6, ease: "sine.inOut", yoyo: true, repeat: -1 });
+
+      // Real progress -> one heat value, smoothed, written through quick setters (transform/opacity only).
+      const set = {
+        halo: gsap.quickSetter(halo, "scaleX"),
+        haloY: gsap.quickSetter(halo, "scaleY"),
+        haloAlpha: gsap.quickSetter(halo, "opacity"),
+        gold: gsap.quickSetter(gold, "opacity"),
+        glassBase: gsap.quickSetter(glassBase, "opacity"),
+        glassGold: gsap.quickSetter(glassGold, "opacity"),
+        dot: gsap.quickSetter(dot, "opacity"),
+      };
+      const heat = { v: 0 };
+      const apply = () => {
+        const s = heatState(heat.v);
+        set.halo(s.halo);
+        set.haloY(s.halo);
+        set.haloAlpha(s.haloAlpha);
+        set.gold(s.gold);
+        set.glassBase(s.glassBase);
+        set.glassGold(s.glassGold);
+        set.dot(s.dot);
+      };
       let settled = 0;
       const step = () => {
         if (done || disposed) return;
-        const p = ++settled / steps.length;
-        growX(0.2 + 0.8 * p);
-        growY(0.2 + 0.8 * p);
-        brighten(0.55 + 0.45 * p);
+        const to = ++settled / steps.length;
+        ctx.add(() => gsap.to(heat, { v: to, duration: 0.9, ease: "power2.out", overwrite: true, onUpdate: apply }));
       };
       steps.forEach((s) => s.then(step, step));
 
       exit = () => {
         if (done) return;
         done = true; // claimed here so the MAX_MS cap cannot cut the hand-off short
-        gsap
-          .timeline({
-            onComplete: () => {
-              startScroll();
-              refreshScroll();
-              onComplete();
-            },
-          })
-          .to(dot, { scale: 1, opacity: 1, duration: 0.3, ease: "power2.out" })
-          .to(dot, { scale: coverScale(), duration: 0.9, ease: "power4.inOut" })
-          .to(el, { autoAlpha: 0, duration: 0.6, ease: "power2.out" }, "-=0.2")
-          // The blur on the title glyphs is the one filter tween on the page: named exception to the
-          // transform/opacity-only rule (plan §4.3 rule 5, Scene 0 note).
-          .fromTo(
-            words,
-            { filter: "blur(10px)" },
-            { yPercent: 0, autoAlpha: 1, filter: "blur(0px)", duration: 1, ease: "power4.out", stagger: 0.05 },
-            "-=0.5",
-          )
-          .to(prompt, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.08 }, "-=0.55");
+        // Created from a timer, outside the context's callback: add() so a revert also kills it.
+        ctx.add(() => {
+          sway.kill();
+          gsap
+            .timeline({ onComplete })
+            // full heat, the swing damps out, the bulb swells and flares to its hottest
+            .to(heat, { v: 1, duration: 0.3, ease: "power2.out", onUpdate: apply }, 0)
+            .to(swing, { rotation: 0, duration: 0.7, ease: "power2.out" }, 0)
+            .to(swell, { scale: 1.7, duration: 0.35, ease: "power2.out" }, 0.1)
+            .to(hot, { opacity: 1, duration: 0.3, ease: "power2.out" }, 0.1)
+            // ...then settles back onto the 14px dot (scale 1 = Scene 0's rest bulb, pixel for pixel)
+            .to(swell, { scale: 1, duration: 0.6, ease: "power3.out" }, 0.45)
+            .to(hot, { opacity: 0, duration: 0.5, ease: "power2.out" }, 0.45)
+            .call(unlock, undefined, 0.9)
+            // the veil cross-fades onto the identical rest bulb underneath
+            .to(el, { autoAlpha: 0, duration: 0.25, ease: "power2.out" }, 0.9)
+            // the title rises out of the light: rules draw, Bangla words rise (blur to sharp: the one
+            // filter tween on the page, a named exception to transform/opacity-only), then the English letters
+            .to(rules, { scaleX: 1, duration: 0.8, ease: "power3.out", stagger: 0.08 }, 0.95)
+            .fromTo(
+              words,
+              { filter: "blur(8px)" },
+              { yPercent: 0, autoAlpha: 1, filter: "blur(0px)", clearProps: "filter", duration: 1, ease: "power3.out", stagger: 0.12 },
+              1.05,
+            )
+            .to(letters, { yPercent: 0, autoAlpha: 1, duration: 0.7, ease: "power3.out", stagger: 0.035 }, 1.5)
+            .to(prompt, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.08 }, 2.1);
+        });
       };
     }, root);
 
@@ -151,23 +207,11 @@ export default function Loader({
   }, [assets, onComplete, reducedMotion]);
 
   return (
-    <div
-      ref={root}
-      data-preloader
-      className="fixed inset-0 z-60 grid place-items-center"
-      // Same gradient as body::before, so the veil's fade-out has nothing to pop against.
-      style={{ background: "linear-gradient(to bottom, var(--sky-top), var(--sky-bottom))" }}
-    >
+    <div ref={root} data-preloader className="intro-veil">
       <noscript>
         <style>{`[data-preloader]{display:none}`}</style>
       </noscript>
-      <div aria-hidden="true" className="absolute aspect-square w-[42vmin] rounded-full bg-glow opacity-[0.12] blur-[6vmin]" />
-      <div
-        data-loader-dot
-        aria-hidden="true"
-        className="aspect-square w-[18vmin] rounded-full bg-glow"
-        style={{ transform: "scale(0.2)", opacity: 0.55 }}
-      />
+      <IntroBulb heat={0} low={tier === "low"} />
       <p role="status" className="sr-only">
         Loading A Day in Dhaka
       </p>

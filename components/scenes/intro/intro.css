@@ -1,0 +1,113 @@
+/*
+  Scene 0 (the bulb) + its Loader veil: scene-local rules. Every colour is a mix of the shared tokens
+  (sky timeline vars, --glow, --cue-notebook, --text); no hex. Imported by Scene0Intro and Loader.
+*/
+
+/* Orange to gold: --glow (Tong Amber) is the gold at rest; the cold end is it pulled toward the notebook red. */
+.intro-stage,
+.intro-veil {
+  --bulb-orange: color-mix(in oklab, var(--glow) 55%, var(--cue-notebook));
+  --bulb-hot: color-mix(in oklab, var(--glow) 62%, var(--text));
+  --bulb-metal: color-mix(in oklab, var(--text-muted) 42%, var(--ink));
+  --bulb-wire: color-mix(in oklab, var(--text-muted) 52%, var(--sky-top));
+}
+.intro-orange-fill { fill: var(--bulb-orange); }
+.intro-orange-stroke { stroke: var(--bulb-orange); }
+.intro-gold-stroke { stroke: var(--glow); }
+.intro-hot-fill { fill: var(--bulb-hot); }
+.intro-socket { fill: var(--bulb-metal); }
+.intro-glass-edge { stroke: color-mix(in oklab, var(--text-muted) 78%, transparent); }
+.intro-speck { fill: var(--text); opacity: 0.4; }
+.intro-wire-stroke { stroke: var(--bulb-wire); }
+.intro-wires path { stroke: var(--ink); }
+
+/* Bulb geometry: everything sits on the stage centre (the 14px dot), px around it. */
+.intro-swing { position: absolute; inset: 0; }
+.intro-wire { position: absolute; top: 0; left: 50%; width: 24px; margin-left: -12px; }
+/* 1x1 (a zero-size <svg> is not rendered), its top-left corner IS the stage centre, so art units are px around it */
+.intro-art { position: absolute; left: 50%; top: 50%; overflow: visible; }
+.intro-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28svh;
+  height: 28svh;
+  margin-left: -14svh;
+  margin-top: -14svh;
+  overflow: visible;
+  transform-origin: 50% 50%;
+}
+
+/* The Loader veil: same sky as body::before so its exit has nothing to pop against. Exactly the stage's box. */
+.intro-veil {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: 100svh;
+  z-index: 60;
+  background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+}
+
+/* Ambient: the lamp breathes a little (opacity on its own group; GSAP never touches it). */
+@media (prefers-reduced-motion: no-preference) {
+  .intro-breathe { animation: intro-breathe 4.8s ease-in-out infinite; }
+}
+@keyframes intro-breathe {
+  50% { opacity: 0.78; }
+}
+
+/* The hand-off layers start hidden; the scroll timeline drifts them in (their from-state is set by GSAP too). */
+.intro-fade-in { opacity: 0; visibility: hidden; }
+
+/* ---- the title lockup: Bangla over English between two hairlines with print ticks ---- */
+.intro-lockup {
+  position: relative;
+  display: inline-block;
+  padding: clamp(0.7rem, 1.6svh, 1.1rem) clamp(1rem, 4vw, 2.75rem);
+  text-align: center;
+}
+.intro-rule {
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: color-mix(in oklab, var(--text) 55%, transparent);
+}
+.intro-rule::before,
+.intro-rule::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 9px;
+  background: inherit;
+}
+.intro-rule::before { left: 0; }
+.intro-rule::after { right: 0; }
+.intro-rule[data-rule="top"] { top: 0; }
+.intro-rule[data-rule="top"]::before,
+.intro-rule[data-rule="top"]::after { top: 0; }
+.intro-rule[data-rule="bottom"] { bottom: 0; }
+.intro-rule[data-rule="bottom"]::before,
+.intro-rule[data-rule="bottom"]::after { bottom: 0; }
+
+/* Display voice: the serif. Sized to the lockup, rem floors so browser zoom still enlarges it. */
+.intro-title-bn {
+  display: block;
+  font-size: clamp(2.25rem, min(1.2rem + 4.2vw, 0.4rem + 7.6svh), 4.25rem);
+  line-height: 1.25;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.intro-title-en {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: clamp(0.8125rem, 0.72rem + 0.5vw, 1.0625rem);
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.intro-word { display: inline-block; white-space: nowrap; }
+.intro-word + .intro-word { margin-left: 0.62em; }
+
+.intro-prompt-bn { font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.3125rem); line-height: 1.3; }

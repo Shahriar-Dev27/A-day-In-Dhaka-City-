@@ -5,5 +5,16 @@ export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
 export default function Icon() {
-  return new ImageResponse(<div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", background: palette[0].skyTop }}><svg width="100" height="115" viewBox="0 0 100 115"><path d="M16 28H84L76 97Q50 109 24 97Z" fill={palette[0].accent} /><ellipse cx="50" cy="28" rx="34" ry="8" fill={palette[0].glow} /><path d="M39 13Q30 7 39 0M61 13Q70 7 61 0" fill="none" stroke={palette[0].text} strokeWidth="3" /></svg></div>, size);
+  const p = palette[0];
+  return new ImageResponse(
+    <div style={{ display: "flex", width: "100%", height: "100%", background: p.skyTop }}>
+      <svg width="180" height="180" viewBox="0 0 64 64">
+        <path d="M32 0v14" stroke={p.textMuted} strokeWidth="3" />
+        <rect x="27" y="13" width="10" height="8" rx="2" fill={p.wall} />
+        <circle cx="32" cy="33" r="14" fill={p.glow} />
+        <circle cx="32" cy="33" r="6" fill={p.text} />
+      </svg>
+    </div>,
+    size,
+  );
 }

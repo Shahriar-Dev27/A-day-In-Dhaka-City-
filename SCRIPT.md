@@ -1,3 +1,5 @@
+> **Superseded by `docs/storyboard/SCRIPT-v2.md` (approved 2026-10-02). Kept for history.**
+
 # A Day in Dhaka: Scene Script (Storyboard)
 
 Companion to `A-Day-in-Dhaka-PLAN.md`. Put this file at `/docs/storyboard/SCRIPT.md`.

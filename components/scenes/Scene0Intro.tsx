@@ -2,16 +2,42 @@
 
 import { useRef } from "react";
 import { COPY } from "@/lib/copy";
-import { LIGHT_DOT } from "@/lib/scenes";
-import { Art, SplitWords, Stage, useSceneTimeline } from "./scene-kit";
+import type { SceneProps } from "@/lib/scenes";
+import { SplitWords, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
+import { DriftIn, IntroBulb } from "./intro/art";
+import "./intro/intro.css";
 
 const { title, prompt } = COPY[0].extra!;
 
-// Load progress drives the veil's dot in components/Loader.tsx, which expands over the screen and
-// hands off to this one; scroll then expands this circle into the next sky.
-// Takes SceneProps per contract; the placeholder uses none (reduced motion is handled by gsap.matchMedia).
-export default function Scene0Intro() {
+/** English title, one masked span per letter (Latin only: Bangla is never split below the word). */
+function Letters({ text }: { text: string }) {
+  return text.split(" ").map((word, w) => (
+    <span key={w} className="intro-word" aria-hidden="true">
+      {[...word].map((ch, i) => (
+        <span key={i} className="split-mask">
+          <span data-letter className="split-word">
+            {ch}
+          </span>
+        </span>
+      ))}
+    </span>
+  ));
+}
+
+/*
+  Scene 0: the bulb. This file draws the REST state (a warm bulb on its wire at the stage centre, the
+  title lockup, the scroll prompt); components/Loader.tsx draws the identical bulb in its veil, warms it
+  with real load progress, swells it, then reveals the title/prompt below by animating the elements
+  marked data-intro-reveal, data-intro-fade, data-letter and data-rule (its context reverts to this state, so every default here is
+  the final, visible one). Scroll then owns the hand-off: the title lifts away, the bulb lifts out, and
+  the first mist and overhead wires drift in from the bottom toward Scene 1's night tong.
+  Property owners: Loader = the title's words/letters/rules and the prompt's items; this timeline = the
+  [data-beat] wrappers, [data-bulb-scroll] and [data-drift]; CSS = the lamp's breathing and the prompt line.
+*/
+export default function Scene0Intro({ tier }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
+  const low = tier === "low";
+  useLiveGate(root);
 
   // Slot is 100svh, so the pinned range is zero: scrub from the top until the slot leaves the viewport.
   useSceneTimeline(
@@ -19,46 +45,53 @@ export default function Scene0Intro() {
     0,
     (tl, mode, q) => {
       if (mode === "full") {
-        tl.to(q("[data-dot]"), { scale: 5, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.6, ease: "power2.out" }, 0);
-        tl.to(q("[data-halo]"), { scale: 1.6, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.8, ease: "power2.out" }, 0);
+        tl.to(q("[data-bulb-scroll]"), { yPercent: -16, autoAlpha: 0, duration: 0.6, ease: "power2.out" }, 0);
         tl.to(q("[data-beat]"), { y: -72, autoAlpha: 0, ease: "power2.out", stagger: 0.05, duration: 0.7 }, 0);
+        tl.fromTo(q("[data-drift]"), { yPercent: 26, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, ease: "power2.out", stagger: 0.1, duration: 0.5, immediateRender: true }, 0.4);
       } else {
-        tl.to(q("[data-dot], [data-halo]"), { autoAlpha: 0, ease: "power2.out", duration: 0.8 }, 0);
+        tl.to(q("[data-bulb-scroll]"), { autoAlpha: 0, ease: "power2.out", duration: 0.6 }, 0);
         tl.to(q("[data-beat]"), { autoAlpha: 0, ease: "power2.out", duration: 0.7 }, 0);
+        tl.fromTo(q("[data-drift]"), { autoAlpha: 0 }, { autoAlpha: 1, ease: "power2.out", stagger: 0.1, duration: 0.5, immediateRender: true }, 0.4);
       }
     },
     { narration: false, start: "top top", end: "bottom top" },
   );
 
   return (
-    <div ref={root} className="relative h-full">
+    <div ref={root} className="intro-stage relative h-full">
       <Stage label={title.en}>
-        <Art viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-          <circle data-halo cx="800" cy="450" r="260" className="fill-glow" opacity="0.14" />
-          <circle data-halo cx="800" cy="450" r="150" className="fill-glow" opacity="0.2" />
-        </Art>
-        <span data-dot aria-hidden="true" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-glow" style={{ width: LIGHT_DOT.sizePx, height: LIGHT_DOT.sizePx }} />
+        <div aria-hidden="true" className="absolute inset-0">
+          <DriftIn low={low} />
+        </div>
+        <div data-bulb-scroll aria-hidden="true" className="absolute inset-0">
+          <IntroBulb heat={1} low={low} />
+        </div>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-(--gutter) text-center">
-          <h1 data-beat data-intro-reveal className="mt-[34svh]">
-            <span lang="bn" className="block font-display text-display font-bold text-balance text-copy">
+        <div className="absolute inset-x-0 top-[65svh] flex justify-center px-(--gutter)">
+          <h1 data-beat data-intro-reveal className="intro-lockup">
+            <i data-rule="top" className="intro-rule" aria-hidden="true" />
+            <span lang="bn" data-font-probe className="intro-title-bn font-display text-copy">
               <SplitWords text={title.bn} />
             </span>
-            <span lang="en" className="mt-2 block text-sub font-medium tracking-wide text-copy-muted">
-              <SplitWords text={title.en} />
+            <span lang="en" data-font-probe className="intro-title-en font-sans text-copy-muted">
+              <span className="sr-only">{title.en}</span>
+              <Letters text={title.en} />
             </span>
+            <i data-rule="bottom" className="intro-rule" aria-hidden="true" />
           </h1>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-[max(2rem,env(safe-area-inset-bottom))]">
-          <div data-beat className="flex flex-col items-center gap-3 text-center">
-            <p data-intro-fade lang="bn" className="font-display text-clock font-medium text-copy">
+        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+          <div data-beat className="flex flex-col items-center gap-1 text-center">
+            <p data-intro-fade data-font-probe lang="bn" className="intro-prompt-bn font-display font-medium text-copy">
               {prompt.bn}
             </p>
-            <p data-intro-fade lang="en" className="-mt-2 text-label uppercase text-copy-muted">
+            <p data-intro-fade data-font-probe lang="en" className="text-label uppercase text-copy-muted">
               {prompt.en}
             </p>
-            <span aria-hidden="true" className="scroll-prompt block h-12 w-px bg-copy" />
+            <span data-intro-fade aria-hidden="true" className="mt-2 block">
+              <span className="scroll-prompt block h-9 w-px bg-copy" />
+            </span>
           </div>
         </div>
       </Stage>

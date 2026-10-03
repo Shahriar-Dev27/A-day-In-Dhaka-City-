@@ -3,11 +3,41 @@
   --slip-*, --accent, --glow); no hex. Imported by Scene8Closing only.
 */
 
+/*
+  Midnight relight. The night palette's wall (#1A1F2B family) is so close to the sky that the block, the
+  shutter and the far city vanish; this scene lifts the wall a few steps toward the muted text colour (a
+  mix of tokens, so it still follows the sky), and lets the far city and the minarets stand a little off
+  the sky as silhouettes. `.stage` derives the other set tones from --wall, so they follow.
+*/
+.closing {
+  --wall: color-mix(in oklab, var(--sky-bottom) 80%, var(--text-muted));
+}
+.closing .stage {
+  --far: color-mix(in oklab, var(--wall) 78%, var(--sky-bottom));
+  --minaret: color-mix(in oklab, var(--wall) 88%, var(--ink));
+  --shutter: color-mix(in oklab, var(--wall) 70%, var(--text-muted));
+}
+/* The shutter (TongStall's own) in steel, not in wall-dark: it is one of this scene's subjects. */
+.closing [data-shutter] > rect:first-child {
+  fill: var(--shutter);
+}
+.closing [data-shutter] path {
+  opacity: 0.6;
+}
+
 /* The shop signs are dark at midnight, and the stove is cold: no flame, no steam. */
 .closing [data-sign] {
-  opacity: 0.5;
+  opacity: 0.38;
+}
+.closing-line {
+  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  line-height: 1.3;
 }
 .closing [data-flame] {
+  display: none;
+}
+/* ...and the tea glasses are washed: the tin stands where the tray was (the glasses are the 10-wide rects at y=698). */
+.closing rect[y="698"][width="10"] {
   display: none;
 }
 
