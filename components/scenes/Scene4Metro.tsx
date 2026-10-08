@@ -19,6 +19,7 @@
 import { useRef, type CSSProperties } from "react";
 import { gsap } from "@/lib/gsap";
 import { COPY } from "@/lib/copy";
+import { voiceIdFor } from "@/lib/voice";
 import { metroVars } from "@/lib/palette";
 import type { SceneProps } from "@/lib/scenes";
 import { Art, Camera, Narration, SpeechSlip, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
@@ -237,7 +238,7 @@ export default function Scene4Metro({ tier }: SceneProps) {
           <SpeechSlip line={commuterLine} x={FOCUS_X - 15} y={520} side="right" beat="commuter" />
           <SpeechSlip line={motherLine} x={FOCUS_X + 38} y={496} side="right" beat="mother" />
           {/* the announcement: the ceiling display's LED strip, real text */}
-          <div data-led className={`${m.led} invisible`}>
+          <div data-led data-voice={voiceIdFor(announcement!.bn)} className={`${m.led} invisible`}>
             <p lang="bn" className="font-sans text-clock font-semibold">
               {announcement!.bn}
             </p>

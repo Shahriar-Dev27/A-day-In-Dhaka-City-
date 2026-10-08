@@ -10,6 +10,7 @@ import { initScroll, refreshScroll, scrollToScene } from "@/lib/scroll";
 import { SCENES, skyAnchors, type DeviceTier, type SceneMeta, type SceneProps } from "@/lib/scenes";
 import ClockProgress, { type ClockProgressHandle } from "./ClockProgress";
 import Loader from "./Loader";
+import SoundToggle from "./SoundToggle";
 import Scene0Intro from "./scenes/Scene0Intro";
 import Scene1Fajr from "./scenes/Scene1Fajr";
 import RisoDefs from "./scenes/tong/RisoDefs";
@@ -164,7 +165,7 @@ export default function Experience() {
       }
       tl.set({}, {}, 1); // pad so timeline time === scroll fraction
 
-      // Active scene -> <html data-scene>. Feeds lib/audio.ts later; unused by CSS today.
+      // Active scene -> <html data-scene>. SoundToggle reads it to crossfade the ambience; unused by CSS.
       el.querySelectorAll<HTMLElement>("[data-scene]").forEach((slot) => {
         ScrollTrigger.create({
           trigger: slot,
@@ -198,6 +199,7 @@ export default function Experience() {
         <i />
       </div>
       <ClockProgress ref={clock} />
+      <SoundToggle ready={loaded} />
       {/* Gates scrolling until the real load finishes, then hands off to Scene 0's title reveal. */}
       {!loaded && <Loader assets={INTRO_ASSETS} onComplete={onLoaded} reducedMotion={reducedMotion} tier={tier} />}
       {process.env.NODE_ENV !== "production" && <DevJump />}

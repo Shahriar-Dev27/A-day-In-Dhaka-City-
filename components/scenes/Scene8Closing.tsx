@@ -25,6 +25,7 @@
 import { useId, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { COPY, CREDIT_LINKS, CREDIT_NAME } from "@/lib/copy";
+import { voiceIdFor } from "@/lib/voice";
 import { EASE, SCENES, lightDotStyle, type SceneProps } from "@/lib/scenes";
 import { scrollToScene } from "@/lib/scroll";
 import { Art, Camera, Narration, SpeechSlip, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
@@ -231,7 +232,7 @@ export default function Scene8Closing({ tier }: SceneProps) {
 
         {/* below the dot: the closing line, then the way back to the start */}
         <div className="pointer-events-none absolute inset-x-0 top-[calc(50%+3.25rem)] flex flex-col items-center gap-5 px-(--gutter) text-center" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
-          <p data-closing>
+          <p data-closing data-voice={voiceIdFor(closing.bn)}>
             <span lang="bn" className="closing-line block font-chunky font-semibold text-balance text-copy">{closing.bn}</span>
             <span lang="en" className="mt-1 block font-sans text-sub text-copy-muted">{closing.en}</span>
           </p>

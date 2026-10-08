@@ -43,7 +43,7 @@ export const COPY: Record<SceneId, SceneCopy> = {
   },
   1: {
     narration: { bn: "আজান শেষ, চুলা জ্বলে", en: "The azaan ends, the stove lights." },
-    overheard: [{ who: "guard", bn: "মামা, এক কাপ।", en: "One cup, Mama." }],
+    overheard: [{ who: "guard", bn: "মামা, এক কাপ চা দিয়েন।", en: "Mama, one cup of tea, please." }],
   },
   2: {
     narration: { bn: "সবাই দেরি করে বেরোয়", en: "Everyone leaves a little late." },

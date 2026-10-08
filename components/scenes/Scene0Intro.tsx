@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { COPY } from "@/lib/copy";
+import { voiceIdFor } from "@/lib/voice";
 import type { SceneProps } from "@/lib/scenes";
 import { SplitWords, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
 import { DriftIn, IntroBulb } from "./intro/art";
@@ -70,7 +71,7 @@ export default function Scene0Intro({ tier }: SceneProps) {
         <div className="absolute inset-x-0 top-[65svh] flex justify-center px-(--gutter)">
           <h1 data-beat data-intro-reveal className="intro-lockup">
             <i data-rule="top" className="intro-rule" aria-hidden="true" />
-            <span lang="bn" data-font-probe className="intro-title-bn font-display text-copy">
+            <span lang="bn" data-font-probe data-voice={voiceIdFor(title.bn)} className="intro-title-bn font-display text-copy">
               <SplitWords text={title.bn} />
             </span>
             <span lang="en" data-font-probe className="intro-title-en font-sans text-copy-muted">

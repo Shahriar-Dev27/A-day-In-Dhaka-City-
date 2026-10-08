@@ -31,7 +31,7 @@ From `package.json`:
 - GSAP + `@gsap/react` (ScrollTrigger for scroll-scrubbed timelines)
 - Lenis (smooth scrolling)
 - Canvas 2D (pigeon flock) and plain WebGL (light trails); no three.js
-- Inline SVG for all illustration; no raster images, no audio at launch
+- Inline SVG for all illustration; no raster images; opt-in Bangla voices (offline WAV files) and synthesized city ambience
 - Fonts through `next/font/google` (Noto Serif Bengali, Hind Siliguri, Baloo Da 2)
 
 ## Getting started
@@ -64,7 +64,6 @@ lib/                 Scene registry and scroll offsets, palette, copy (Bangla + 
 shaders/             GLSL for the light trails
 tests/               node:test checks
 docs/                Storyboard, asset log
-.devteam/            Planning and per-phase handoff notes for the v2 rebuild
 ```
 
 ## Conventions
@@ -81,15 +80,30 @@ docs/                Storyboard, asset log
 - Metro (scene 4) details are still to be confirmed.
 - Performance has not been tested on real mobile devices.
 - The social card (`app/opengraph-image.tsx`) shows the English title only; satori mis-shapes Bengali conjuncts, so the Bangla title lives in the page `<title>` instead.
-- `app/favicon.ico` predates the v2 icon and still shows the old mark.
 
 ## Docs
 
 - [Storyboard v2](./docs/storyboard/SCRIPT-v2.md) (current script)
 - [Asset and licence log](./docs/assets.md)
-- [v2 plan](./.devteam/dhaka-v2-tong/01-plan.md) and [summary](./.devteam/dhaka-v2-tong/SUMMARY.md)
-- [SCRIPT.md](./SCRIPT.md) and [A-Day-in-Dhaka-PLAN.md](./A-Day-in-Dhaka-PLAN.md) are the original v1 documents, kept for history.
+- [SCRIPT.md](./SCRIPT.md) is the original v1 script, kept for history.
 
 ## Credits
 
 Designed and built by Shahriar Islam Dip. All illustration, patterns and shaders are original to this project; fonts are SIL OFL 1.1 (see the asset log).
+
+## Sound
+
+Use the **Sound off / Sound on** button in the top-left corner. Sound is off on each page load. With it on:
+
+- **Ambience**: a synthesized bed per scene (night crickets, tea-stall murmur, traffic and horns, metro hum, midday heat, rooftop wind, evening adda) that crossfades as you scroll. It is built in the browser, so there is nothing to download.
+- **Voices**: every Bangla line is spoken when its caption appears: the narration, the overheard dialogue, the metro announcement, the jam's sign words, the title and the closing line. One voice at a time; a line is not cut off the moment its caption leaves (it gets 1.5 s of grace), and the ambience dips while someone speaks. Use the **Voices** button to keep ambience without speech. Playback stops in a hidden tab.
+
+Captions are tagged `data-voice`; the player speaks whichever tagged captions are visible, so no scene timing is duplicated in the audio code. Voice files load only when sound is on, a scene ahead of time.
+
+To regenerate after editing `lib/copy.ts` (Node 24 recommended):
+
+```powershell
+npm.cmd run audio:generate -- "E:\Professional\Web\claude\bangla-tts"
+```
+
+The generator uses that folder's `.venv` and existing model weights, keeps the raw clips in `.audio-raw/` (git-ignored), and writes the mastered WAVs to `public/audio/voice/`, `public/audio/narration.json` and `docs/narration-review.md`. Add `--only s2-o0,s5-n` to redo some clips. To fix a mispronounced line, put a respelled version in `scripts/pronunciation.json` (`{ "s5-n": "..." }`) and regenerate that clip. `npm run audio:master` re-applies the mastering settings to the saved raw clips without the TTS. Settings: speed 0.85, punctuation pauses 1.2, 200 Griffin-Lim iterations (`BANGLA_TTS_ITERS`). For another installation, supply its path; set `BANGLA_TTS_PYTHON` if its interpreter is elsewhere, or `BANGLA_TTS_DIR` to omit the path argument. Deploy the WAVs with the app; the local TTS folder is needed only to regenerate. Listen to the clips as part of the pending native Bangla review.

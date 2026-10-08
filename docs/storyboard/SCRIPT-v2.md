@@ -90,7 +90,7 @@ A single bare bulb on a wire in the dark, swinging a hair. It warms from orange 
 ### Scene 1 — 4:45 AM, "ফজরের আগে"
 Mist between apartment blocks. Overhead wires dripping. A shutter rattles up. Mama strikes a match, the blue burner flame catches, the kettle goes on. The first azaan starts, then a second, a third, each a half-beat off, because that is what Dhaka sounds like. The night guard shuffles up, torch dimming.
 - Narration: **আজান শেষ, চুলা জ্বলে** / *The azaan ends, the stove lights.*
-- Overheard: guard: **“মামা, এক কাপ।”** / *“One cup, Mama.”*
+- Overheard: guard: **“মামা, এক কাপ চা দিয়েন।”** / *“Mama, one cup of tea, please.”*
 - Recognisable: the first tea of the day belongs to whoever stayed awake. The tong opens before the city does.
 
 ### Scene 2 — 7:00 AM, "সবাই দেরি করে বেরোয়"

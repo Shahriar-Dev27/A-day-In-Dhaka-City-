@@ -23,6 +23,7 @@ import { useRef, type CSSProperties, type ReactNode } from "react";
 import { gsap } from "@/lib/gsap";
 import { getScrollVelocityNorm } from "@/lib/scroll";
 import { COPY, type Line } from "@/lib/copy";
+import { voiceIdFor } from "@/lib/voice";
 import type { SceneProps } from "@/lib/scenes";
 import { Narration, SlipAnchor, SpeechSlip, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
 import { LAYERS, LAYER_W, PH, centreX, makeCamera, wheelFactor, type LayerId } from "./jam/layout";
@@ -41,7 +42,7 @@ function Board({ line, x, y, board, ink, hung, leg, tag }: { line: Line; x?: num
   if (y !== undefined) style["--y"] = y;
   if (leg !== undefined) style["--leg"] = leg;
   return (
-    <div className="jam-board" data-board={tag} data-hung={hung ? "" : undefined} style={style as CSSProperties}>
+    <div className="jam-board" data-board={tag} data-voice={voiceIdFor(line.bn)} data-hung={hung ? "" : undefined} style={style as CSSProperties}>
       <p lang="bn" className="jam-board-word">
         {line.bn}
       </p>

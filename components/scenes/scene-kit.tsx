@@ -16,6 +16,7 @@ import { gsap, useGSAP, MOTION_QUERIES } from "@/lib/gsap";
 import type { Line } from "@/lib/copy";
 import type { SceneId } from "@/lib/palette";
 import { SCENES } from "@/lib/scenes";
+import { voiceIdFor } from "@/lib/voice";
 
 export type { Line } from "@/lib/copy";
 export type SceneMode = "full" | "reduce";
@@ -132,7 +133,7 @@ export function Art({
 /** Register 1: one calm line per scene in a reserved top-left band, on the sky. */
 export function Narration({ line }: { line: Line }) {
   return (
-    <div data-narration className="absolute inset-x-(--gutter) top-[12svh] max-w-[34rem]">
+    <div data-narration data-voice={voiceIdFor(line.bn)} className="absolute inset-x-(--gutter) top-[12svh] max-w-[34rem]">
       {/* printed caption mark: a short hairline above the line, in the text colour */}
       <span aria-hidden="true" className="mb-3 block h-px w-12 bg-copy" />
       <p lang="bn" className="font-display text-line font-semibold text-balance text-copy">
@@ -156,6 +157,7 @@ export function SpeechSlip({ line, x, y, side = "right", beat }: { line: Line; x
   return (
     <div
       data-slip={beat ?? ""}
+      data-voice={voiceIdFor(line.bn)}
       data-side={side}
       className="slip"
       style={{ bottom: `calc(${900 - y} * var(--u))`, ...(side === "right" ? { left: `calc(50% + ${dx})` } : { right: `calc(50% - ${dx})` }) }}

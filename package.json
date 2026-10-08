@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test"
+    "test": "node --test",
+    "audio:generate": "node scripts/generate-narration.mjs",
+    "audio:master": "node scripts/generate-narration.mjs --master-only"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

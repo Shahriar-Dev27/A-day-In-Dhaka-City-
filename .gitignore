@@ -51,3 +51,6 @@ next-env.d.ts
 /A-Day-in-Dhaka-PLAN.md
 /AGENTS.md
 /CLAUDE.md
+
+# raw (unmastered) TTS clips; public/audio/voice has the mastered ones
+/.audio-raw/

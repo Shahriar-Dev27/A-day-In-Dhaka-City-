@@ -1,0 +1,242 @@
+{
+  "engine": "Byakto / bangla-tts",
+  "speed": 0.85,
+  "iterations": 200,
+  "pauseScale": 1.2,
+  "clips": [
+    {
+      "id": "s0-title",
+      "scene": 0,
+      "kind": "title",
+      "who": "narrator",
+      "text": "একটি দিন, ঢাকায়",
+      "file": "voice/s0-title.wav",
+      "seconds": 1.869
+    },
+    {
+      "id": "s1-n",
+      "scene": 1,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "আজান শেষ, চুলা জ্বলে",
+      "file": "voice/s1-n.wav",
+      "seconds": 2.353
+    },
+    {
+      "id": "s1-o0",
+      "scene": 1,
+      "kind": "overheard",
+      "who": "guard",
+      "text": "মামা, এক কাপ চা দিয়েন।",
+      "file": "voice/s1-o0.wav",
+      "seconds": 2.16
+    },
+    {
+      "id": "s2-n",
+      "scene": 2,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "সবাই দেরি করে বেরোয়",
+      "file": "voice/s2-n.wav",
+      "seconds": 1.429
+    },
+    {
+      "id": "s2-o0",
+      "scene": 2,
+      "kind": "overheard",
+      "who": "worker",
+      "text": "মামা, ভাংতি নাই।",
+      "file": "voice/s2-o0.wav",
+      "seconds": 1.974
+    },
+    {
+      "id": "s2-o1",
+      "scene": 2,
+      "kind": "overheard",
+      "who": "mama",
+      "text": "পরে দিয়েন।",
+      "file": "voice/s2-o1.wav",
+      "seconds": 0.733
+    },
+    {
+      "id": "s3-n",
+      "scene": 3,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "৯টা বাজে, ঢাকা থামে না",
+      "file": "voice/s3-n.wav",
+      "seconds": 2.317
+    },
+    {
+      "id": "s3-o0",
+      "scene": 3,
+      "kind": "overheard",
+      "who": "commuter",
+      "text": "আসতেছি, পাঁচ মিনিট।",
+      "file": "voice/s3-o0.wav",
+      "seconds": 1.889
+    },
+    {
+      "id": "s3-g0",
+      "scene": 3,
+      "kind": "giant",
+      "who": "narrator",
+      "text": "আসতেছি",
+      "file": "voice/s3-g0.wav",
+      "seconds": 0.712
+    },
+    {
+      "id": "s3-g1",
+      "scene": 3,
+      "kind": "giant",
+      "who": "narrator",
+      "text": "জ্যাম",
+      "file": "voice/s3-g1.wav",
+      "seconds": 0.559
+    },
+    {
+      "id": "s3-g2",
+      "scene": 3,
+      "kind": "giant",
+      "who": "narrator",
+      "text": "সামনে আগান",
+      "file": "voice/s3-g2.wav",
+      "seconds": 0.947
+    },
+    {
+      "id": "s4-n",
+      "scene": 4,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "ঢাকাকে উপর থেকে দেখা",
+      "file": "voice/s4-n.wav",
+      "seconds": 1.545
+    },
+    {
+      "id": "s4-o0",
+      "scene": 4,
+      "kind": "overheard",
+      "who": "boy",
+      "text": "বাবা, দেখো! আমরা বাসের উপরে!",
+      "file": "voice/s4-o0.wav",
+      "seconds": 3.541
+    },
+    {
+      "id": "s4-o1",
+      "scene": 4,
+      "kind": "overheard",
+      "who": "commuter",
+      "text": "এইবার সত্যি আসতেছি।",
+      "file": "voice/s4-o1.wav",
+      "seconds": 1.582
+    },
+    {
+      "id": "s4-o2",
+      "scene": 4,
+      "kind": "overheard",
+      "who": "mother",
+      "text": "ওরে বাবা, কত উঁচু!",
+      "file": "voice/s4-o2.wav",
+      "seconds": 2.138
+    },
+    {
+      "id": "s4-a",
+      "scene": 4,
+      "kind": "announcement",
+      "who": "narrator",
+      "text": "পরবর্তী স্টেশন: ফার্মগেট",
+      "file": "voice/s4-a.wav",
+      "seconds": 2.378
+    },
+    {
+      "id": "s5-n",
+      "scene": 5,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "রোদ যত কড়া, ছায়া তত দামি",
+      "file": "voice/s5-n.wav",
+      "seconds": 2.831
+    },
+    {
+      "id": "s5-o0",
+      "scene": 5,
+      "kind": "overheard",
+      "who": "offscreen",
+      "text": "আবার কারেন্ট গেল!",
+      "file": "voice/s5-o0.wav",
+      "seconds": 1.209
+    },
+    {
+      "id": "s6-n",
+      "scene": 6,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "ছাদ আমাদের উঠান",
+      "file": "voice/s6-n.wav",
+      "seconds": 1.241
+    },
+    {
+      "id": "s6-o0",
+      "scene": 6,
+      "kind": "overheard",
+      "who": "kid",
+      "text": "ভো-কাট্টা!",
+      "file": "voice/s6-o0.wav",
+      "seconds": 0.756
+    },
+    {
+      "id": "s7-n",
+      "scene": 7,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "বাড়ি ফেরার আগে, একটু আড্ডা",
+      "file": "voice/s7-n.wav",
+      "seconds": 2.419
+    },
+    {
+      "id": "s7-o0",
+      "scene": 7,
+      "kind": "overheard",
+      "who": "worker",
+      "text": "মামা, সকালেরটা নেন।",
+      "file": "voice/s7-o0.wav",
+      "seconds": 1.934
+    },
+    {
+      "id": "s7-o1",
+      "scene": 7,
+      "kind": "overheard",
+      "who": "mama",
+      "text": "কাটলাম।",
+      "file": "voice/s7-o1.wav",
+      "seconds": 0.6
+    },
+    {
+      "id": "s8-n",
+      "scene": 8,
+      "kind": "narration",
+      "who": "narrator",
+      "text": "ঘুমায় শহর, স্বপ্ন জাগে",
+      "file": "voice/s8-n.wav",
+      "seconds": 2.176
+    },
+    {
+      "id": "s8-o0",
+      "scene": 8,
+      "kind": "overheard",
+      "who": "mama",
+      "text": "হ্যাঁ, খাইছি। তুমি খাইছো?",
+      "file": "voice/s8-o0.wav",
+      "seconds": 3.053
+    },
+    {
+      "id": "s8-closing",
+      "scene": 8,
+      "kind": "closing",
+      "who": "narrator",
+      "text": "কাল আবার।",
+      "file": "voice/s8-closing.wav",
+      "seconds": 0.773
+    }
+  ]
+}
