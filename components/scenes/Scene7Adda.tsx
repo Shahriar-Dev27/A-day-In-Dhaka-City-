@@ -14,8 +14,8 @@
     0.22-0.40  the worker walks in; 0.41-0.50 the note drops and is pushed across the counter
     0.41-0.585 worker slip, 0.595-0.77 Mama slip, 0.765-0.87 the notebook inset opens and the line is struck
   Engine: GSAP scrub on the slot. Mosquitoes are CSS loops on their own elements (paused off-screen). High
-  tier: the light-trail shader (one WebGL context, mounted only while the slot is on screen, disposed by
-  R3F on unmount) smears headlights over the wet road; low tier and reduced motion get SVG streaks.
+  tier: the light-trail shader (one WebGL context, mounted only while the slot is on screen, released by
+  loseContext() on unmount) smears headlights over the wet road; low tier and reduced motion get SVG streaks.
   Reduced motion: camera fixed, no travel, every beat an opacity beat on final positions, no WebGL.
 */
 
@@ -47,7 +47,7 @@ export default function Scene7Adda({ tier, reducedMotion }: SceneProps) {
   const ease = EASE[SCENES[7].ease];
   useLiveGate(root);
 
-  // WebGL only on the high tier, only while the slot is on screen; R3F disposes the context on unmount.
+  // WebGL only on the high tier, only while the slot is on screen; LightTrails releases the context on unmount.
   useEffect(() => {
     const slot = root.current?.parentElement;
     if (!slot || low || reducedMotion) return;

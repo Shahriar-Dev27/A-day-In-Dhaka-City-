@@ -297,7 +297,7 @@ test("intro: the bulb's core is the loop dot (lightDotStyle) in both the veil an
   assert.match(loader, /document\.fonts\.load/); // real progress from the faces the title uses
   assert.doesNotMatch(loader, /Math\.random/); // nothing faked
   // heat: dim/orange -> full/gold, each channel monotonic, rest (1) = the full state, halo grows
-  const src = art.match(/export function heatState[\s\S]*?\n}\n/)[0].replace("export function heatState(h: number)", "(h)").replace(/\/\/.*\n/g, "");
+  const src = art.match(/export function heatState[\s\S]*?\r?\n}\r?\n/)[0].replace("export function heatState(h: number)", "(h)").replace(/\/\/.*\r?\n/g, "");
   const heatState = eval(`(${src.replace(/^\(h\) \{/, "(h) => {")})`);
   let prev = heatState(0);
   assert.equal(heatState(1).halo, 1);

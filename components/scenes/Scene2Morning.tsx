@@ -2,10 +2,11 @@
 
 /*
   Scene 2, 7:00 AM. Same tong, day light. Kids with bags bigger than their backs and garment workers
-  stream across, a newspaper hawker sorts his bundle on the bench, one worker holds out a Tk 500 note
-  ("no change, Mama" / "pay me later") and the first line goes into the red notebook as the glide ends
-  on the counter. Engine: GSAP scrub on the slot; ambient loops are CSS (paused off-screen). Reduced
-  motion: camera fixed at 1.06, the stream and the walk-in are replaced by opacity beats on final positions.
+  stream across, a paratha flips twice on the tawa beside the kettle, a newspaper hawker sorts his bundle
+  on the bench, one worker holds out a Tk 500 note ("no change, Mama" / "pay me later") and the first line
+  goes into the red notebook as the glide ends on the counter. Engine: GSAP scrub on the slot; ambient
+  loops are CSS (paused off-screen). Reduced motion: camera fixed at 1.06, the stream and the walk-in are
+  replaced by opacity beats on final positions, the paratha does not leave the pan (its faces swap by opacity).
 */
 
 import { useRef } from "react";
@@ -14,7 +15,7 @@ import { COPY } from "@/lib/copy";
 import { EASE, SCENES, type SceneProps } from "@/lib/scenes";
 import { Art, Camera, Narration, SpeechSlip, Stage, useLiveGate, useSceneTimeline } from "./scene-kit";
 import { Dog, GarmentWorker, Hawker, Mama, SchoolKid } from "./tong/cast";
-import type { V2 } from "./tong/geometry";
+import { STROKE, type V2 } from "./tong/geometry";
 import { TongBackdrop, TongBench, TongStall, TongWires, type TongState } from "./tong/TongSet";
 
 const { narration, overheard } = COPY[2];
@@ -24,6 +25,47 @@ const WORKER_AT: V2 = [742, 868];
 
 const KIDS = [0, 150, 270] as const; // x spacing of the three school kids
 const PAIR = [0, 120] as const; // the garment workers who cross in front
+const FLIPS = [0.16, 0.34] as const; // the paratha's two flips, inside the morning stream
+
+/** One paratha face: a flat edge-on disc, outlined so it reads on the lit back wall, with browned spots. */
+function ParathaFace({ face, spots, className }: { face: string; spots: readonly (readonly [number, number])[]; className: string }) {
+  return (
+    <g data-paratha-face={face}>
+      <ellipse cx="0" cy="0" rx="22" ry="4.2" className={`${className} stroke-ink`} strokeWidth="1.2" strokeOpacity="0.6" />
+      {spots.map(([x, y]) => (
+        <ellipse key={x} cx={x} cy={y} rx="3.4" ry="1.2" className="fill-wood" opacity="0.85" />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * The paratha tawa (morning only): a low ring stove on the counter between the glass case and the burner,
+ * a shallow iron pan, a khunti resting on the rim, and one paratha (data-paratha, drawn around a local 0,0)
+ * whose visible face goes raw -> first side browned -> second side browned.
+ */
+function Tawa() {
+  return (
+    <g data-tawa>
+      <rect x="722" y="714" width="44" height="8" rx="2" className="fill-ink" />
+      {[732, 744, 756].map((x, i) => (
+        <path key={x} d={`M${x} 715c-3 -2 -1 -6 0 -8c1 2 3 6 0 8z`} className="flame-tongue loop fill-glow" style={{ animationDelay: `${i * 0.11}s` }} />
+      ))}
+      <path d="M712 706q32 10 64 0l-2 4q-30 10 -60 0z" className="fill-ink" />
+      <path d="M716 707q28 7 56 0" fill="none" className="stroke-wall-lit" strokeWidth={STROKE.hair} opacity="0.45" />
+      <g transform="translate(742 703)">
+        <g data-paratha>
+          <ParathaFace face="raw" spots={[]} className="fill-paper" />
+          <ParathaFace face="one" spots={[[-10, -1], [3, 1], [13, -1]]} className="fill-glow" />
+          <ParathaFace face="two" spots={[[-13, 1], [-3, -1], [8, 1], [16, 0]]} className="fill-glow" />
+        </g>
+      </g>
+      {/* the khunti: a flat steel blade on the rim, a wooden handle */}
+      <path d="M762 704l10 -2l1 3l-10 2z" className="fill-wall-lit" />
+      <path d="M771 702L782 694" className="stroke-wood" strokeWidth="3" strokeLinecap="round" />
+    </g>
+  );
+}
 
 export default function Scene2Morning({ tier }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
@@ -45,8 +87,11 @@ export default function Scene2Morning({ tier }: SceneProps) {
     const pages = $("[data-notebook-pages]");
     const line = $("[data-notebook-line]");
     const [slipW, slipM] = [$('[data-slip="worker"]'), $('[data-slip="mama"]')];
+    const paratha = $("[data-paratha]");
+    const faces = ["raw", "one", "two"].map((f) => $(`[data-paratha-face="${f}"]`));
 
-    gsap.set([hold, mamaWrite, pages, line, slipW, slipM], { autoAlpha: 0 });
+    gsap.set([hold, mamaWrite, pages, line, slipW, slipM, faces[1], faces[2]], { autoAlpha: 0 });
+    if (full) gsap.set(paratha, { transformOrigin: "50% 50%" }); // set once: a changing origin drifts when scrubbed
     if (full) {
       gsap.set([...kids, ...pair, ...back, ...walkIn], { x: -420 });
       gsap.set(walkIn, { x: -700 });
@@ -79,6 +124,21 @@ export default function Scene2Morning({ tier }: SceneProps) {
       tl.to([...kids, ...pair, ...back], { autoAlpha: 0, duration: 0.05, ease: "power2.out" }, 0.44);
       tl.to(hold, { autoAlpha: 1, duration: 0.06, ease: "power2.out" }, 0.42);
     }
+
+    // the tawa: the paratha hops, turns edge-on (scaleY through 0) and lands; the face swaps at the edge
+    FLIPS.forEach((t, i) => {
+      const [from, to] = [faces[i], faces[i + 1]];
+      if (full) {
+        tl.to(paratha, { y: -22, duration: 0.03, ease: "power2.out" }, t);
+        tl.to(paratha, { y: 0, duration: 0.03, ease: "power2.in" }, t + 0.03);
+        tl.to(paratha, { scaleY: i % 2 ? 1 : -1, duration: 0.06, ease: "sine.inOut" }, t);
+        tl.set(from, { autoAlpha: 0 }, t + 0.03);
+        tl.set(to, { autoAlpha: 1 }, t + 0.03);
+      } else {
+        tl.to(from, { autoAlpha: 0, duration: 0.03, ease: "power2.out" }, t);
+        tl.to(to, { autoAlpha: 1, duration: 0.03, ease: "power2.out" }, t);
+      }
+    });
 
     // 0.46-0.85 the exchange, one slip at a time (each is on screen >= 0.18 of the scene = 30 svh = 1 s at the AC-D3 pace)
     tl.to(slipW, { autoAlpha: 1, duration: 0.04, ease: "power2.out" }, 0.46);
@@ -121,6 +181,7 @@ export default function Scene2Morning({ tier }: SceneProps) {
                 <Mama at={MAMA_AT} flip pose="write" />
               </g>
             </TongStall>
+            <Tawa />
             <TongBench bundle />
             <Dog at={[1130, 862]} pose="stand" />
             <Hawker at={[586, 862]} />
